@@ -83,6 +83,9 @@ const TRANSLATIONS = {
     edNoSensor: '⏱ Không có cảm biến vị trí',
     edTravelTime: '⏱ Thời gian hành trình (giây)',
     edNoSensorHint: 'Bật nếu cổng không có cảm biến vị trí. Card sẽ tính vị trí theo thời gian.',
+    edInvertSensor: '🔄 Đảo chiều cảm biến vị trí',
+    edInvertSensorHint: 'Bật nếu cảm biến báo ngược (100% = đóng). Card sẽ tự đảo giá trị vị trí.',
+    lightBtn: 'ĐÈN',
   },
   en: {
     lang: 'English', flag: 'gb',
@@ -128,6 +131,9 @@ const TRANSLATIONS = {
     edNoSensor: '⏱ No position sensor',
     edTravelTime: '⏱ Travel time (seconds)',
     edNoSensorHint: 'Enable if the gate has no position sensor. Position will be estimated by timer.',
+    edInvertSensor: '🔄 Invert position sensor',
+    edInvertSensorHint: 'Enable if sensor reports reversed values (100% = closed). Card will invert the position.',
+    lightBtn: 'LIGHT',
   },
   de: {
     lang: 'Deutsch', flag: 'de',
@@ -173,6 +179,9 @@ const TRANSLATIONS = {
     edNoSensor: '⏱ Kein Positionssensor',
     edTravelTime: '⏱ Fahrzeit (Sekunden)',
     edNoSensorHint: 'Aktivieren, wenn kein Positionssensor vorhanden. Position wird per Timer geschätzt.',
+    edInvertSensor: '🔄 Positionssensor umkehren',
+    edInvertSensorHint: 'Aktivieren, wenn Sensor umgekehrte Werte liefert (100% = geschlossen).',
+    lightBtn: 'LICHT',
   },
   fr: {
     lang: 'Français', flag: 'fr',
@@ -218,6 +227,9 @@ const TRANSLATIONS = {
     edNoSensor: '⏱ Pas de capteur de position',
     edTravelTime: '⏱ Temps de course (secondes)',
     edNoSensorHint: 'Activer si le portail n\'a pas de capteur. La position sera estimée par minuterie.',
+    edInvertSensor: '🔄 Inverser le capteur de position',
+    edInvertSensorHint: 'Activer si le capteur renvoie des valeurs inversées (100% = fermé).',
+    lightBtn: 'LUMIÈRE',
   },
   nl: {
     lang: 'Nederlands', flag: 'nl',
@@ -263,6 +275,9 @@ const TRANSLATIONS = {
     edNoSensor: '⏱ Geen positiesensor',
     edTravelTime: '⏱ Looptijd (seconden)',
     edNoSensorHint: 'Inschakelen als de poort geen positiesensor heeft. Positie wordt geschat via timer.',
+    edInvertSensor: '🔄 Positiesensor omkeren',
+    edInvertSensorHint: 'Inschakelen als sensor omgekeerde waarden geeft (100% = gesloten).',
+    lightBtn: 'LICHT',
   },
   pl: {
     lang: 'Polski', flag: 'pl',
@@ -308,6 +323,9 @@ const TRANSLATIONS = {
     edNoSensor: '⏱ Brak czujnika pozycji',
     edTravelTime: '⏱ Czas przejazdu (sekundy)',
     edNoSensorHint: 'Włącz, jeśli brama nie ma czujnika. Pozycja będzie szacowana przez timer.',
+    edInvertSensor: '🔄 Odwróć czujnik pozycji',
+    edInvertSensorHint: 'Włącz jeśli czujnik podaje odwrócone wartości (100% = zamknięta).',
+    lightBtn: 'ŚWIATŁO',
   },
   sv: {
     lang: 'Svenska', flag: 'se',
@@ -353,6 +371,9 @@ const TRANSLATIONS = {
     edNoSensor: '⏱ Ingen positionssensor',
     edTravelTime: '⏱ Körtid (sekunder)',
     edNoSensorHint: 'Aktivera om grinden saknar positionssensor. Position beräknas via timer.',
+    edInvertSensor: '🔄 Invertera positionssensor',
+    edInvertSensorHint: 'Aktivera om sensorn rapporterar omvända värden (100% = stängd).',
+    lightBtn: 'LJUS',
   },
   hu: {
     lang: 'Magyar', flag: 'hu',
@@ -398,6 +419,9 @@ const TRANSLATIONS = {
     edNoSensor: '⏱ Nincs pozícióérzékelő',
     edTravelTime: '⏱ Menetidő (másodperc)',
     edNoSensorHint: 'Aktiváld, ha a kapunak nincs pozícióérzékelője. A pozíció időzítővel lesz becsülve.',
+    edInvertSensor: '🔄 Pozícióérzékelő invertálása',
+    edInvertSensorHint: 'Aktiváld, ha az érzékelő fordított értékeket ad (100% = zárva).',
+    lightBtn: 'LÁMPA',
   },
   cs: {
     lang: 'Čeština', flag: 'cz',
@@ -443,6 +467,9 @@ const TRANSLATIONS = {
     edNoSensor: '⏱ Bez snímače polohy',
     edTravelTime: '⏱ Čas jízdy (sekundy)',
     edNoSensorHint: 'Zapnout pokud brána nemá snímač polohy. Pozice bude odhadnuta časovačem.',
+    edInvertSensor: '🔄 Invertovat snímač polohy',
+    edInvertSensorHint: 'Zapnout pokud snímač hlásí obrácené hodnoty (100% = zavřeno).',
+    lightBtn: 'SVĚTLO',
   },
   it: {
     lang: 'Italiano', flag: 'it',
@@ -488,6 +515,9 @@ const TRANSLATIONS = {
     edNoSensor: '⏱ Nessun sensore posizione',
     edTravelTime: '⏱ Tempo di corsa (secondi)',
     edNoSensorHint: 'Attiva se il cancello non ha sensore. La posizione sarà stimata tramite timer.',
+    edInvertSensor: '🔄 Inverti sensore posizione',
+    edInvertSensorHint: 'Attiva se il sensore riporta valori invertiti (100% = chiuso).',
+    lightBtn: 'LUCE',
   },
 };
 
@@ -543,6 +573,7 @@ const DEFAULT_CONFIG = {
   entity_flipped: '',
   home_name: '',
   no_sensor: false,
+  invert_sensor: false,
   travel_time_sec: 20,
 };
 
@@ -865,7 +896,8 @@ class GateCard extends HTMLElement {
     const cfg   = this._config;
     const t     = this.t;
     // Use timer-based position if no_sensor is enabled, otherwise read sensor
-    const pos   = cfg.no_sensor ? this._timerPos : parsePos(hass, cfg.entity_gate_position);
+    const rawPos = cfg.no_sensor ? this._timerPos : parsePos(hass, cfg.entity_gate_position);
+    const pos    = cfg.invert_sensor && !cfg.no_sensor ? 100 - rawPos : rawPos;
     const isOpen  = sv(hass, cfg.entity_gate_open)  === 'on';
     const isClose = sv(hass, cfg.entity_gate_close) === 'on';
     const isStop  = sv(hass, cfg.entity_gate_stop)  === 'on';
@@ -1038,7 +1070,7 @@ class GateCard extends HTMLElement {
     <button id="b-bl" class="ctrl-btn" style="margin:4px 0 4px 3px;height:40px;" data-action="toggle-light">
       <div style="display:flex;align-items:center;gap:5px;padding:0 8px;">
         <ha-icon icon="mdi:lightbulb" id="b-bl-ico" style="color:rgba(255,220,50,0.7);--mdi-icon-size:16px;flex-shrink:0;"></ha-icon>
-        <span class="bl" style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">ĐÈN</span>
+        <span class="bl" style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.lightBtn}</span>
       </div>
     </button>
   </div>
@@ -1641,7 +1673,7 @@ class GateCardEditor extends HTMLElement {
 </style>
 <div class="editor">
   <div class="credit">🚧 <strong>Gate Card</strong>
-    <span style="color:var(--secondary-text-color);font-weight:400;">v1.1 Designed by @doanlong1412 from 🇻🇳 Vietnam</span>
+    <span style="color:var(--secondary-text-color);font-weight:400;">v1.1.1 Designed by @doanlong1412 from 🇻🇳 Vietnam</span>
   </div>
 
   <!-- 1. Language -->
@@ -1770,6 +1802,27 @@ class GateCardEditor extends HTMLElement {
             <span id="travel-time-val" style="font-family:monospace;font-size:14px;font-weight:700;color:var(--primary-color);min-width:40px;text-align:right;">${cfg.travel_time_sec||20}s</span>
           </div>
         </div>` : ''}
+      </div>
+      <div style="padding:4px 0 8px;border-bottom:1px solid var(--divider-color);margin-bottom:6px;">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;padding:4px 0;">
+          <div style="position:relative;width:40px;height:22px;flex-shrink:0;">
+            <span id="toggle-invert-sensor" style="
+              position:absolute;inset:0;border-radius:11px;cursor:pointer;transition:background .2s;
+              background:${cfg.invert_sensor?'var(--primary-color,#03a9f4)':'rgba(0,0,0,0.12)'};
+              border:1px solid ${cfg.invert_sensor?'var(--primary-color,#03a9f4)':'var(--divider-color)'};
+            ">
+              <span style="
+                position:absolute;top:2px;left:${cfg.invert_sensor?'20':'2'}px;width:16px;height:16px;
+                border-radius:50%;background:#fff;transition:left .2s;
+                box-shadow:0 1px 3px rgba(0,0,0,0.3);
+              "></span>
+            </span>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;color:var(--primary-text-color);">${t.edInvertSensor}</div>
+            <div style="font-size:11px;color:var(--secondary-text-color);margin-top:2px;line-height:1.4;">${t.edInvertSensorHint}</div>
+          </div>
+        </label>
       </div>
       ${cfg.no_sensor ? '' : this._entityField('entity_gate_position', t.entityGatePos, 'sensor')}
       ${this._entityField('entity_gate_open',     t.entityGateOpen,  'switch')}
@@ -1950,6 +2003,17 @@ class GateCardEditor extends HTMLElement {
         this._render();
       };
       noSensorToggle.addEventListener('click', doToggle);
+    }
+
+    // invert-sensor toggle
+    const invertSensorToggle = sr.getElementById('toggle-invert-sensor');
+    if (invertSensorToggle) {
+      invertSensorToggle.addEventListener('click', () => {
+        const val = !this._config.invert_sensor;
+        this._config = { ...this._config, invert_sensor: val };
+        this._fire();
+        this._render();
+      });
     }
 
     // travel time slider — live preview, fire on change
