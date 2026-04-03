@@ -1,7 +1,39 @@
 /**
  * Gate Card — Custom Home Assistant Lovelace Card
- * V1.0 Designed by @doanlong1412 from 🇻🇳 Vietnam
+ * v1.1.0 Designed by @doanlong1412 from 🇻🇳 Vietnam
  * HACS-compatible Web Component
+ *
+ * ─── What's new in v1.1.0 ────────────────────────────────────────────────────
+ *  🏠 gate_style: 'shutter'  — Rolling shutter / garage door diagram
+ *      Animated slats (roll up/down with real position), house facade,
+ *      Vietnamese flag, car inside garage, glowing wall lamps when light is on,
+ *      sky cropped to minimise wasted space.
+ *
+ *  🚗 license_plate_line1 / license_plate_line2
+ *      Customisable car plate rendered on the vehicle in the garage diagram.
+ *
+ *  🏠 home_name
+ *      Custom label shown on the motor box ("MY HOME" by default).
+ *
+ *  ⏱  no_sensor + travel_time_sec
+ *      Timer-based position engine for gates without a position sensor.
+ *      Card interpolates 0→100% over travel_time_sec when relay fires.
+ *
+ *  🌐 6 new languages  (total 10)
+ *      🇫🇷 Français · 🇳🇱 Nederlands · 🇵🇱 Polski
+ *      🇸🇪 Svenska  · 🇭🇺 Magyar    · 🇨🇿 Čeština
+ *      Real country flag images via flagcdn.com.
+ *      All editor labels also translate when switching language.
+ *
+ *  🎨 16 background gradient presets  (8 new: Cherry, Volcano, Galaxy,
+ *      Ice, Olive, Slate, Rose, Teal) — 5-column compact grid in editor.
+ *
+ *  🎛  Editor reordered: Language → Style → Name → Entities → Colors → BG
+ *      Size slider removed; card height is now fixed (min 290 / max 400 px).
+ *
+ *  🐛 Camera fix   — object-fit: contain keeps true 16:9, no zoom/crop.
+ *  🐛 Focus fix    — title/zone inputs no longer lose focus on every keystroke.
+ * ─────────────────────────────────────────────────────────────────────────────
  */
 
 // ─── i18n ─────────────────────────────────────────────────────────────────────
@@ -37,6 +69,20 @@ const TRANSLATIONS = {
     entityMotion: '🏃 Cảm biến chuyển động', entityPerson: '👤 Cảm biến người',
     entityFlipped: '🔄 Input Boolean lật card',
     color1: 'Màu 1 (trên trái)', color2: 'Màu 2 (dưới phải)',
+    edLang: 'Ngôn ngữ',
+    edStyle: 'Kiểu cổng / cửa',
+    edName: 'Tên cổng',
+    edStyleSlide: '🚧 CỔNG TRƯỢT',
+    edStyleShutter: '🏠 CỬA CUỐN',
+    edGateTitle: '🚧 Tên cổng (hiển thị trên card)',
+    edGateZone: '📍 Zone / mô tả phụ',
+    edPlate1: '🚗 Biển số xe (dòng 1)',
+    edPlate2: '🚗 Biển số xe (dòng 2)',
+    edSensorPos: '📡 Cảm biến cổng',
+    edHomeName: '🏠 Tên My Home',
+    edNoSensor: '⏱ Không có cảm biến vị trí',
+    edTravelTime: '⏱ Thời gian hành trình (giây)',
+    edNoSensorHint: 'Bật nếu cổng không có cảm biến vị trí. Card sẽ tính vị trí theo thời gian.',
   },
   en: {
     lang: 'English', flag: 'gb',
@@ -68,6 +114,20 @@ const TRANSLATIONS = {
     entityMotion: '🏃 Motion sensor', entityPerson: '👤 Person sensor',
     entityFlipped: '🔄 Flip state boolean',
     color1: 'Color 1 (top left)', color2: 'Color 2 (bottom right)',
+    edLang: 'Language',
+    edStyle: 'Gate / Door Style',
+    edName: 'Gate Name',
+    edStyleSlide: '🚧 SLIDING GATE',
+    edStyleShutter: '🏠 SHUTTER DOOR',
+    edGateTitle: '🚧 Gate name (shown on card)',
+    edGateZone: '📍 Zone / subtitle',
+    edPlate1: '🚗 License plate (line 1)',
+    edPlate2: '🚗 License plate (line 2)',
+    edSensorPos: '📡 Gate sensor',
+    edHomeName: '🏠 My Home name',
+    edNoSensor: '⏱ No position sensor',
+    edTravelTime: '⏱ Travel time (seconds)',
+    edNoSensorHint: 'Enable if the gate has no position sensor. Position will be estimated by timer.',
   },
   de: {
     lang: 'Deutsch', flag: 'de',
@@ -99,6 +159,20 @@ const TRANSLATIONS = {
     entityMotion: '🏃 Bewegungssensor', entityPerson: '👤 Personensensor',
     entityFlipped: '🔄 Input Boolean Flip',
     color1: 'Farbe 1 (oben links)', color2: 'Farbe 2 (unten rechts)',
+    edLang: 'Sprache',
+    edStyle: 'Tor- / Türart',
+    edName: 'Torname',
+    edStyleSlide: '🚧 SCHIEBETOR',
+    edStyleShutter: '🏠 ROLLTOR',
+    edGateTitle: '🚧 Torname (auf Karte)',
+    edGateZone: '📍 Zone / Untertitel',
+    edPlate1: '🚗 Kennzeichen (Zeile 1)',
+    edPlate2: '🚗 Kennzeichen (Zeile 2)',
+    edSensorPos: '📡 Tor-Sensor',
+    edHomeName: '🏠 My Home Name',
+    edNoSensor: '⏱ Kein Positionssensor',
+    edTravelTime: '⏱ Fahrzeit (Sekunden)',
+    edNoSensorHint: 'Aktivieren, wenn kein Positionssensor vorhanden. Position wird per Timer geschätzt.',
   },
   fr: {
     lang: 'Français', flag: 'fr',
@@ -130,6 +204,20 @@ const TRANSLATIONS = {
     entityMotion: '🏃 Détecteur de mouvement', entityPerson: '👤 Détecteur de personne',
     entityFlipped: '🔄 Booléen de retournement',
     color1: 'Couleur 1 (haut gauche)', color2: 'Couleur 2 (bas droite)',
+    edLang: 'Langue',
+    edStyle: 'Type de portail',
+    edName: 'Nom du portail',
+    edStyleSlide: '🚧 PORTAIL COULISSANT',
+    edStyleShutter: '🏠 PORTE ROULANTE',
+    edGateTitle: '🚧 Nom (affiché sur la carte)',
+    edGateZone: '📍 Zone / sous-titre',
+    edPlate1: '🚗 Plaque (ligne 1)',
+    edPlate2: '🚗 Plaque (ligne 2)',
+    edSensorPos: '📡 Capteur de portail',
+    edHomeName: '🏠 Nom My Home',
+    edNoSensor: '⏱ Pas de capteur de position',
+    edTravelTime: '⏱ Temps de course (secondes)',
+    edNoSensorHint: 'Activer si le portail n\'a pas de capteur. La position sera estimée par minuterie.',
   },
   nl: {
     lang: 'Nederlands', flag: 'nl',
@@ -161,6 +249,20 @@ const TRANSLATIONS = {
     entityMotion: '🏃 Bewegingssensor', entityPerson: '👤 Persoonssensor',
     entityFlipped: '🔄 Invoerbooleaan flip',
     color1: 'Kleur 1 (linksboven)', color2: 'Kleur 2 (rechtsonder)',
+    edLang: 'Taal',
+    edStyle: 'Poort- / Deurstijl',
+    edName: 'Poortnaam',
+    edStyleSlide: '🚧 SCHUIFPOORT',
+    edStyleShutter: '🏠 ROLLUIK',
+    edGateTitle: '🚧 Poortnaam (op kaart)',
+    edGateZone: '📍 Zone / ondertitel',
+    edPlate1: '🚗 Kenteken (regel 1)',
+    edPlate2: '🚗 Kenteken (regel 2)',
+    edSensorPos: '📡 Poortsensor',
+    edHomeName: '🏠 My Home naam',
+    edNoSensor: '⏱ Geen positiesensor',
+    edTravelTime: '⏱ Looptijd (seconden)',
+    edNoSensorHint: 'Inschakelen als de poort geen positiesensor heeft. Positie wordt geschat via timer.',
   },
   pl: {
     lang: 'Polski', flag: 'pl',
@@ -192,6 +294,20 @@ const TRANSLATIONS = {
     entityMotion: '🏃 Czujnik ruchu', entityPerson: '👤 Czujnik osoby',
     entityFlipped: '🔄 Wartość logiczna odwrócenia',
     color1: 'Kolor 1 (lewy górny)', color2: 'Kolor 2 (prawy dolny)',
+    edLang: 'Język',
+    edStyle: 'Typ bramy / drzwi',
+    edName: 'Nazwa bramy',
+    edStyleSlide: '🚧 BRAMA PRZESUWNA',
+    edStyleShutter: '🏠 BRAMA ROLOWANA',
+    edGateTitle: '🚧 Nazwa (widoczna na karcie)',
+    edGateZone: '📍 Strefa / podtytuł',
+    edPlate1: '🚗 Tablica rejestracyjna (linia 1)',
+    edPlate2: '🚗 Tablica rejestracyjna (linia 2)',
+    edSensorPos: '📡 Czujnik bramy',
+    edHomeName: '🏠 Nazwa My Home',
+    edNoSensor: '⏱ Brak czujnika pozycji',
+    edTravelTime: '⏱ Czas przejazdu (sekundy)',
+    edNoSensorHint: 'Włącz, jeśli brama nie ma czujnika. Pozycja będzie szacowana przez timer.',
   },
   sv: {
     lang: 'Svenska', flag: 'se',
@@ -223,6 +339,20 @@ const TRANSLATIONS = {
     entityMotion: '🏃 Rörelsesensor', entityPerson: '👤 Personsensor',
     entityFlipped: '🔄 Boolesk flip',
     color1: 'Färg 1 (övre vänster)', color2: 'Färg 2 (nedre höger)',
+    edLang: 'Språk',
+    edStyle: 'Grind- / Dörrstil',
+    edName: 'Grindnamn',
+    edStyleSlide: '🚧 SKJUTGRIND',
+    edStyleShutter: '🏠 RULLPORT',
+    edGateTitle: '🚧 Grindnamn (visas på kort)',
+    edGateZone: '📍 Zon / underrubrik',
+    edPlate1: '🚗 Registreringsskylt (rad 1)',
+    edPlate2: '🚗 Registreringsskylt (rad 2)',
+    edSensorPos: '📡 Grindgivare',
+    edHomeName: '🏠 My Home namn',
+    edNoSensor: '⏱ Ingen positionssensor',
+    edTravelTime: '⏱ Körtid (sekunder)',
+    edNoSensorHint: 'Aktivera om grinden saknar positionssensor. Position beräknas via timer.',
   },
   hu: {
     lang: 'Magyar', flag: 'hu',
@@ -254,6 +384,20 @@ const TRANSLATIONS = {
     entityMotion: '🏃 Mozgásérzékelő', entityPerson: '👤 Személyérzékelő',
     entityFlipped: '🔄 Logikai flip',
     color1: 'Szín 1 (bal felső)', color2: 'Szín 2 (jobb alsó)',
+    edLang: 'Nyelv',
+    edStyle: 'Kapu / Ajtó típus',
+    edName: 'Kapu neve',
+    edStyleSlide: '🚧 TOLÓKAPU',
+    edStyleShutter: '🏠 REDŐNYKAPU',
+    edGateTitle: '🚧 Kapu neve (kártyán látható)',
+    edGateZone: '📍 Zóna / alcím',
+    edPlate1: '🚗 Rendszám (1. sor)',
+    edPlate2: '🚗 Rendszám (2. sor)',
+    edSensorPos: '📡 Kapuérzékelő',
+    edHomeName: '🏠 My Home neve',
+    edNoSensor: '⏱ Nincs pozícióérzékelő',
+    edTravelTime: '⏱ Menetidő (másodperc)',
+    edNoSensorHint: 'Aktiváld, ha a kapunak nincs pozícióérzékelője. A pozíció időzítővel lesz becsülve.',
   },
   cs: {
     lang: 'Čeština', flag: 'cz',
@@ -285,6 +429,20 @@ const TRANSLATIONS = {
     entityMotion: '🏃 Senzor pohybu', entityPerson: '👤 Senzor osoby',
     entityFlipped: '🔄 Logická hodnota překlápění',
     color1: 'Barva 1 (vlevo nahoře)', color2: 'Barva 2 (vpravo dole)',
+    edLang: 'Jazyk',
+    edStyle: 'Typ brány / dveří',
+    edName: 'Název brány',
+    edStyleSlide: '🚧 POSUVNÁ BRÁNA',
+    edStyleShutter: '🏠 ROLOVACÍ BRÁNA',
+    edGateTitle: '🚧 Název (zobrazený na kartě)',
+    edGateZone: '📍 Zóna / podnadpis',
+    edPlate1: '🚗 Registrační značka (řádek 1)',
+    edPlate2: '🚗 Registrační značka (řádek 2)',
+    edSensorPos: '📡 Snímač brány',
+    edHomeName: '🏠 Název My Home',
+    edNoSensor: '⏱ Bez snímače polohy',
+    edTravelTime: '⏱ Čas jízdy (sekundy)',
+    edNoSensorHint: 'Zapnout pokud brána nemá snímač polohy. Pozice bude odhadnuta časovačem.',
   },
   it: {
     lang: 'Italiano', flag: 'it',
@@ -316,6 +474,20 @@ const TRANSLATIONS = {
     entityMotion: '🏃 Sensore movimento', entityPerson: '👤 Sensore presenza',
     entityFlipped: '🔄 Input Boolean flip',
     color1: 'Colore 1 (in alto a sinistra)', color2: 'Colore 2 (in basso a destra)',
+    edLang: 'Lingua',
+    edStyle: 'Tipo di cancello',
+    edName: 'Nome cancello',
+    edStyleSlide: '🚧 CANCELLO SCORREVOLE',
+    edStyleShutter: '🏠 PORTA AVVOLGIBILE',
+    edGateTitle: '🚧 Nome (mostrato sulla card)',
+    edGateZone: '📍 Zona / sottotitolo',
+    edPlate1: '🚗 Targa (riga 1)',
+    edPlate2: '🚗 Targa (riga 2)',
+    edSensorPos: '📡 Sensore cancello',
+    edHomeName: '🏠 Nome My Home',
+    edNoSensor: '⏱ Nessun sensore posizione',
+    edTravelTime: '⏱ Tempo di corsa (secondi)',
+    edNoSensorHint: 'Attiva se il cancello non ha sensore. La posizione sarà stimata tramite timer.',
   },
 };
 
@@ -351,6 +523,7 @@ const DEFAULT_CONFIG = {
   language: 'vi',
   gate_title: '',
   gate_zone: '',
+  gate_style: 'slide',   // 'slide' = cổng trượt ngang | 'shutter' = cửa cuốn nhà xe
   background_preset: 'default',
   bg_color1: '#001e2b',
   bg_color2: '#12c6f3',
@@ -359,7 +532,6 @@ const DEFAULT_CONFIG = {
   btn_stop_color: '#ff5252',
   btn_close_color: '#00dcff',
   text_color: '#ffffff',
-  card_height: 320,
   entity_gate_position: '',
   entity_gate_open: '',
   entity_gate_close: '',
@@ -369,6 +541,9 @@ const DEFAULT_CONFIG = {
   entity_motion: '',
   entity_person: '',
   entity_flipped: '',
+  home_name: '',
+  no_sensor: false,
+  travel_time_sec: 20,
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -402,6 +577,12 @@ class GateCard extends HTMLElement {
     this._flipped  = false;
     this._built    = false;
     this._interval = null;
+    // Timer-based position (for gates without position sensor)
+    this._timerPos      = 0;   // 0=closed, 100=open
+    this._timerDir      = 0;   // 1=opening, -1=closing, 0=idle
+    this._timerInterval = null;
+    this._lastOpenState  = false;
+    this._lastCloseState = false;
   }
 
   setConfig(config) {
@@ -428,12 +609,42 @@ class GateCard extends HTMLElement {
       }
       this._patch();
     }
+    // Timer-based position: detect relay state changes
+    if (this._config.no_sensor) {
+      const isOpen  = sv(hass, this._config.entity_gate_open)  === 'on';
+      const isClose = sv(hass, this._config.entity_gate_close) === 'on';
+      if (isOpen !== this._lastOpenState || isClose !== this._lastCloseState) {
+        this._lastOpenState  = isOpen;
+        this._lastCloseState = isClose;
+        this._startTimerPos(isOpen ? 1 : isClose ? -1 : 0);
+      }
+    }
     this._syncCamera();
+  }
+
+  // ── Timer-based position engine ──────────────────────────────────────────────
+  _startTimerPos(dir) {
+    if (this._timerInterval) clearInterval(this._timerInterval);
+    this._timerDir = dir;
+    if (dir === 0) return;
+    const travel  = Math.max(5, parseInt(this._config.travel_time_sec) || 20);
+    const tickMs  = 200;
+    const step    = (100 / (travel * 1000)) * tickMs;
+    this._timerInterval = setInterval(() => {
+      this._timerPos = Math.max(0, Math.min(100, this._timerPos + dir * step));
+      if (this._timerPos >= 100 || this._timerPos <= 0) {
+        clearInterval(this._timerInterval);
+        this._timerInterval = null;
+        this._timerDir = 0;
+      }
+      this._patch();
+    }, tickMs);
   }
 
   connectedCallback()    { this._interval = setInterval(() => this._patch(), 30000); }
   disconnectedCallback() {
     clearInterval(this._interval);
+    if (this._timerInterval) clearInterval(this._timerInterval);
     // Clear snapshot refresh timer
     const slot = this.shadowRoot?.getElementById('cam-slot');
     if (slot?._snapTimer) clearInterval(slot._snapTimer);
@@ -491,7 +702,6 @@ class GateCard extends HTMLElement {
   _buildDOM() {
     const cfg   = this._config;
     const t     = this.t;
-    const cardH = parseInt(cfg.card_height, 10) || 320;
     const bg    = presetGradient(cfg.background_preset, cfg.bg_color1, cfg.bg_color2);
     const accent= cfg.accent_color || '#00ffcc';
 
@@ -504,7 +714,8 @@ class GateCard extends HTMLElement {
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   border-radius:22px;border:1px solid rgba(0,255,255,0.3);
   box-shadow:0 12px 40px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.15);
-  overflow:hidden;position:relative;height:${cardH}px;
+  overflow:hidden;position:relative;
+  min-height:290px;max-height:400px;
   display:flex;flex-direction:column;
 }
 .card::before{content:"";position:absolute;inset:0;
@@ -518,7 +729,7 @@ class GateCard extends HTMLElement {
 .front,.back{display:flex;flex-direction:column;flex:1;min-height:0;}
 .row-main{display:flex;flex:1;min-height:0;overflow:hidden;}
 .info-col{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-.cam-col{flex:0 0 45%;max-width:45%;border-left:1px solid rgba(0,255,255,.2);overflow:hidden;position:relative;background:#000;display:flex;flex-direction:column;}
+.cam-col{flex:0 0 55%;max-width:55%;border-left:1px solid rgba(0,255,255,.2);overflow:hidden;position:relative;background:#000;display:flex;flex-direction:column;}
 .cam-col #cam-slot{flex:1;min-height:0;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;}
 .cam-col #cam-slot img{width:100%;height:100%;object-fit:contain;object-position:center;display:block;}
 .cam-col ha-camera-stream,.cam-col hui-image{width:100%;height:100%;display:block;}
@@ -608,14 +819,29 @@ class GateCard extends HTMLElement {
       const bClose = cfg.btn_close_color || '#00dcff';
       const set = (id, fn) => { const el = sr.getElementById(id); if(el) fn(el); };
 
+      const lightOn = sv(this._hass, cfg.entity_gate_light) === 'on';
+
       const svgEl = sr.getElementById('b-svg');
-      if (svgEl) svgEl.innerHTML = this._svgInner(pos, isOpen, isClose, isStop, isClosed, isMoving);
+      if (svgEl) {
+        const isShutter = (cfg.gate_style || 'slide') === 'shutter';
+        svgEl.innerHTML = isShutter
+          ? this._svgShutter(pos, isOpen, isClose, isStop, isClosed, isMoving, lightOn)
+          : this._svgInner(pos, isOpen, isClose, isStop, isClosed, isMoving, lightOn);
+      }
 
       set('b-dot',  el => { el.style.background = statusColor; el.style.boxShadow = `0 0 8px ${statusColor}`; });
       set('b-stat', el => { el.textContent = statusText; el.style.color = statusColor; el.style.textShadow = `0 0 10px ${statusColor}99`; });
       set('b-sub',  el => { el.textContent = subText; });
+      set('b-pct',  el => { el.textContent = `${Math.round(pos)}%`; });
       set('b-wo',   el => { el.style.display = isOpen  ? '' : 'none'; });
       set('b-wc',   el => { el.style.display = isClose ? '' : 'none'; });
+
+      // Light button state
+      set('b-bl', el => {
+        el.style.background  = lightOn ? 'rgba(255,220,50,0.22)' : 'rgba(0,0,0,0.25)';
+        el.style.borderColor = lightOn ? 'rgba(255,220,50,0.75)' : 'rgba(255,255,255,0.15)';
+      });
+      set('b-bl-ico', el => { el.style.color = lightOn ? '#ffd740' : 'rgba(255,220,50,0.55)'; });
 
       const applyBtn = (id, active, color, disabled) => {
         set(id, el => {
@@ -638,7 +864,8 @@ class GateCard extends HTMLElement {
     const hass  = this._hass;
     const cfg   = this._config;
     const t     = this.t;
-    const pos   = parsePos(hass, cfg.entity_gate_position);
+    // Use timer-based position if no_sensor is enabled, otherwise read sensor
+    const pos   = cfg.no_sensor ? this._timerPos : parsePos(hass, cfg.entity_gate_position);
     const isOpen  = sv(hass, cfg.entity_gate_open)  === 'on';
     const isClose = sv(hass, cfg.entity_gate_close) === 'on';
     const isStop  = sv(hass, cfg.entity_gate_stop)  === 'on';
@@ -689,8 +916,7 @@ class GateCard extends HTMLElement {
     const t      = this.t;
     const accent = cfg.accent_color || '#00ffcc';
     const tc     = cfg.text_color   || '#ffffff';
-    const cardH  = parseInt(cfg.card_height, 10) || 320;
-    const btnH   = Math.max(34, Math.round(cardH * 0.11));
+    const btnH   = 36;
 
     // Camera: placeholder div — real element injected via _syncCamera()
     const cameraHTML = cfg.entity_camera
@@ -703,21 +929,21 @@ class GateCard extends HTMLElement {
 <div class="front">
   <div class="row-main">
     <div class="info-col">
-      <div style="padding:6px 12px 8px 18px;flex:1;display:flex;flex-direction:column;justify-content:center;overflow:hidden;">
-        <div style="display:flex;align-items:center;gap:5px;margin-bottom:10px;">
-          <div style="font-size:30px;line-height:1;filter:drop-shadow(0 0 14px rgba(0,0,0,.8));">🚧</div>
-          <div>
-            <div style="font-family:Rajdhani,sans-serif;font-size:24px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:${tc};line-height:1;text-shadow:0 2px 8px rgba(0,0,0,.8);">${cfg.gate_title || t.title}</div>
-            <div style="font-family:monospace;font-size:11px;letter-spacing:1.2px;color:rgba(255,255,255,.9);margin-top:5px;">${cfg.gate_zone || t.zone}</div>
+      <div style="padding:5px 8px 6px 10px;flex:1;display:flex;flex-direction:column;justify-content:center;overflow:hidden;">
+        <div style="display:flex;align-items:center;gap:4px;margin-bottom:7px;">
+          <div style="font-size:22px;line-height:1;filter:drop-shadow(0 0 10px rgba(0,0,0,.8));flex-shrink:0;">🚧</div>
+          <div style="min-width:0;overflow:hidden;">
+            <div style="font-family:Rajdhani,sans-serif;font-size:18px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:${tc};line-height:1;text-shadow:0 2px 8px rgba(0,0,0,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${cfg.gate_title || t.title}</div>
+            <div style="font-family:monospace;font-size:9px;letter-spacing:0.8px;color:rgba(255,255,255,.85);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${cfg.gate_zone || t.zone}</div>
           </div>
         </div>
-        <div style="display:flex;align-items:center;gap:7px;margin-top:4px;">
-          <div id="f-dot" style="width:9px;height:9px;border-radius:50%;flex-shrink:0;background:#00ffcc;box-shadow:0 0 10px #00ffcc;"></div>
-          <span id="f-stxt" style="font-family:monospace;font-size:11px;letter-spacing:1.5px;font-weight:700;color:#00ffcc;text-shadow:0 0 10px #00ffcc;"></span>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:2px;">
+          <div id="f-dot" style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:#00ffcc;box-shadow:0 0 10px #00ffcc;"></div>
+          <span id="f-stxt" style="font-family:monospace;font-size:10px;letter-spacing:1px;font-weight:700;color:#00ffcc;text-shadow:0 0 10px #00ffcc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></span>
         </div>
-        <div id="f-sub" style="font-family:monospace;font-size:10px;color:rgba(255,255,255,.55);margin-top:6px;letter-spacing:1px;"></div>
-        <div style="margin-top:10px;">
-          <div style="display:flex;justify-content:space-between;font-family:monospace;font-size:9px;color:rgba(255,255,255,.4);margin-bottom:3px;letter-spacing:1px;">
+        <div id="f-sub" style="font-family:monospace;font-size:9px;color:rgba(255,255,255,.55);margin-top:4px;letter-spacing:0.8px;"></div>
+        <div style="margin-top:8px;">
+          <div style="display:flex;justify-content:space-between;font-family:monospace;font-size:8px;color:rgba(255,255,255,.4);margin-bottom:3px;letter-spacing:0.8px;">
             <span>${t.posClose}</span>
             <span id="f-pct" style="color:rgba(255,255,255,.7);font-weight:700;">0%</span>
             <span>${t.posOpen}</span>
@@ -725,9 +951,9 @@ class GateCard extends HTMLElement {
           <div class="prog-track"><div id="f-fill" class="prog-fill" style="width:0%;background:linear-gradient(90deg,#00ccaa,#00eeff);"></div></div>
         </div>
       </div>
-      <div id="f-lbtn" class="light-btn" style="background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.25);" data-action="toggle-light">
-        <span style="font-size:15px;">🔦</span>
-        <span id="f-ltxt" style="font-family:monospace;font-size:10px;letter-spacing:1.5px;color:rgba(255,255,255,.7);font-weight:700;">${t.light(false)}</span>
+      <div id="f-lbtn" class="light-btn" style="background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.25);margin:0 8px 8px 10px;padding:4px 8px;" data-action="toggle-light">
+        <span style="font-size:13px;">🔦</span>
+        <span id="f-ltxt" style="font-family:monospace;font-size:9px;letter-spacing:1px;color:rgba(255,255,255,.7);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.light(false)}</span>
       </div>
     </div>
     <div class="cam-col" ${cfg.entity_camera ? 'data-action="open-camera" style="cursor:pointer;"' : ''}>
@@ -765,46 +991,65 @@ class GateCard extends HTMLElement {
     const bOpen = cfg.btn_open_color  || '#00ff96';
     const bStop = cfg.btn_stop_color  || '#ff5252';
     const bClose= cfg.btn_close_color || '#00dcff';
-    const cardH = parseInt(cfg.card_height, 10) || 320;
-    const btnH  = Math.max(30, Math.round(cardH * 0.10));
-    const ctrlH = Math.max(48, Math.round(cardH * 0.15));
+    const isShutter = (cfg.gate_style || 'slide') === 'shutter';
+    const openIcon  = isShutter ? 'mdi:arrow-up-bold'   : 'mdi:arrow-expand-left';
+    const closeIcon = isShutter ? 'mdi:arrow-down-bold' : 'mdi:arrow-expand-right';
 
+    const initLight = this._hass ? sv(this._hass, this._config.entity_gate_light) === 'on' : false;
+    const timerBadge = cfg.no_sensor ? `<span style="font-family:monospace;font-size:8px;color:rgba(255,180,0,0.7);letter-spacing:0.5px;background:rgba(255,180,0,0.1);border:1px solid rgba(255,180,0,0.3);border-radius:4px;padding:1px 5px;">⏱ TIMER</span>` : '';
     return `
 <div class="back">
   <div class="svg-wrap">
-    <svg id="b-svg" viewBox="0 0 560 175" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;max-width:560px;margin:0 auto;">
-      ${this._svgInner(0, false, false, false, true, false)}
+    <svg id="b-svg" viewBox="${isShutter ? '0 0 660 390' : '0 0 560 175'}" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;margin:0 auto;max-height:${isShutter?'220px':'130px'}">
+      ${isShutter ? this._svgShutter(0, false, false, false, true, false, initLight) : this._svgInner(0, false, false, false, true, false, initLight)}
     </svg>
     <div class="status-row">
       <div id="b-dot" style="width:9px;height:9px;border-radius:50%;background:#00ccaa;box-shadow:0 0 8px #00ccaa;flex-shrink:0;"></div>
       <span id="b-stat" style="font-size:12px;font-weight:700;letter-spacing:2px;color:#00ccaa;text-transform:uppercase;text-shadow:0 0 10px #00ccaa99;"></span>
       <span id="b-sub" style="font-size:10px;color:rgba(255,255,255,.55);letter-spacing:1px;margin-left:4px;"></span>
+      <span style="margin-left:auto;display:flex;align-items:center;gap:5px;flex-shrink:0;">
+        ${timerBadge}
+        <span style="font-family:monospace;font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:0.5px;">${cfg.no_sensor ? '⏱' : t.edSensorPos}</span>
+        <span id="b-pct" style="font-family:monospace;font-size:10px;color:rgba(0,255,200,0.7);letter-spacing:1px;font-weight:700;"></span>
+      </span>
     </div>
   </div>
   <div id="b-wo" class="warn-scroll" style="display:none;"><span class="warn-inner"><span style="padding-right:60px;">${t.warn_open}</span><span style="padding-right:60px;">${t.warn_open}</span><span style="padding-right:60px;">${t.warn_open}</span></span></div>
   <div id="b-wc" class="warn-scroll" style="display:none;"><span class="warn-inner"><span style="padding-right:60px;">${t.warn_close}</span><span style="padding-right:60px;">${t.warn_close}</span><span style="padding-right:60px;">${t.warn_close}</span></span></div>
   <div class="ctrl-row" style="flex:1;">
-    <button id="b-bo" class="ctrl-btn" style="margin:4px 3px 4px 0;height:${ctrlH}px;" data-action="open-gate">
-      <ha-icon icon="mdi:arrow-expand-left" style="color:${bOpen}b3;--mdi-icon-size:18px;"></ha-icon>
-      <span class="bl" style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.open}</span>
+    <button id="b-bo" class="ctrl-btn" style="margin:4px 3px 4px 0;height:40px;" data-action="open-gate">
+      <div style="display:flex;align-items:center;gap:5px;padding:0 8px;">
+        <ha-icon icon="${openIcon}" style="color:${bOpen}b3;--mdi-icon-size:16px;flex-shrink:0;"></ha-icon>
+        <span class="bl" style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.open}</span>
+      </div>
     </button>
-    <button id="b-bs" class="ctrl-btn" style="margin:4px 3px;height:${ctrlH}px;" data-action="stop-gate">
-      <ha-icon icon="mdi:stop" style="color:${bStop}b3;--mdi-icon-size:18px;"></ha-icon>
-      <span class="bl" style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.stop}</span>
+    <button id="b-bs" class="ctrl-btn" style="margin:4px 3px;height:40px;" data-action="stop-gate">
+      <div style="display:flex;align-items:center;gap:5px;padding:0 8px;">
+        <ha-icon icon="mdi:stop" style="color:${bStop}b3;--mdi-icon-size:16px;flex-shrink:0;"></ha-icon>
+        <span class="bl" style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.stop}</span>
+      </div>
     </button>
-    <button id="b-bc" class="ctrl-btn" style="margin:4px 0 4px 3px;height:${ctrlH}px;" data-action="close-gate">
-      <ha-icon icon="mdi:arrow-expand-right" style="color:${bClose}b3;--mdi-icon-size:18px;"></ha-icon>
-      <span class="bl" style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.close}</span>
+    <button id="b-bc" class="ctrl-btn" style="margin:4px 3px;height:40px;" data-action="close-gate">
+      <div style="display:flex;align-items:center;gap:5px;padding:0 8px;">
+        <ha-icon icon="${closeIcon}" style="color:${bClose}b3;--mdi-icon-size:16px;flex-shrink:0;"></ha-icon>
+        <span class="bl" style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.close}</span>
+      </div>
+    </button>
+    <button id="b-bl" class="ctrl-btn" style="margin:4px 0 4px 3px;height:40px;" data-action="toggle-light">
+      <div style="display:flex;align-items:center;gap:5px;padding:0 8px;">
+        <ha-icon icon="mdi:lightbulb" id="b-bl-ico" style="color:rgba(255,220,50,0.7);--mdi-icon-size:16px;flex-shrink:0;"></ha-icon>
+        <span class="bl" style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">ĐÈN</span>
+      </div>
     </button>
   </div>
-  <div class="flip-btn" style="height:${btnH}px;border-top:1px solid rgba(0,255,255,.15);" data-action="flip">
+  <div class="flip-btn" style="height:34px;border-top:1px solid rgba(0,255,255,.15);" data-action="flip">
     <span style="font-family:monospace;font-size:11px;letter-spacing:3px;color:rgba(255,255,255,.75);text-transform:uppercase;text-shadow:0 0 8px rgba(0,255,255,.4);">${t.back}</span>
   </div>
 </div>`;
   }
 
   // ── SVG inner ────────────────────────────────────────────────────────────────
-  _svgInner(pos, isOpening, isClosing, isStopped, isClosed, isMoving) {
+  _svgInner(pos, isOpening, isClosing, isStopped, isClosed, isMoving, lightOn = false) {
     const gateX     = (pos / 100) * -316;
     const barFill   = pos > 50 ? 'url(#ibh)' : 'url(#ib)';
     const spFill    = pos > 50 ? '#2a5a2e' : '#2e5a70';
@@ -868,7 +1113,293 @@ ${motorDot}${arrowO}${arrowC}
 </g>
 <rect x="80" y="143" width="42" height="5" rx="1" fill="#0e1e0e"/>
 <rect x="438" y="143" width="42" height="5" rx="1" fill="#0e1e0e"/>
+<!-- Gate post lamps -->
+<circle cx="101" cy="18" r="4" fill="${lightOn?'#ffe880':'#1a1a0a'}" stroke="${lightOn?'#ffcc44':'#2a2a1a'}" stroke-width="1"/>
+${lightOn?`<circle cx="101" cy="18" r="18" fill="rgba(255,220,80,0.18)"/><circle cx="101" cy="18" r="10" fill="rgba(255,220,80,0.25)"/>`:''}
+<circle cx="459" cy="18" r="4" fill="${lightOn?'#ffe880':'#1a1a0a'}" stroke="${lightOn?'#ffcc44':'#2a2a1a'}" stroke-width="1"/>
+${lightOn?`<circle cx="459" cy="18" r="18" fill="rgba(255,220,80,0.18)"/><circle cx="459" cy="18" r="10" fill="rgba(255,220,80,0.25)"/>`:''}
 <text x="280" y="168" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.35)" font-family="monospace" letter-spacing="1">${t.position(pos)}</text>`;
+  }
+
+  // ── SVG Shutter (cửa cuốn nhà xe) ───────────────────────────────────────────
+  _svgShutter(pos, isOpening, isClosing, isStopped, isClosed, isMoving, lightOn = false) {
+    const t = this.t;
+    const isOpened  = !isMoving && !isStopped && pos >= 99;
+    const isPartial = !isMoving && !isStopped && pos > 1 && pos < 99;
+
+    const statusText  = isOpening ? t.status.opening
+                      : isClosing ? t.status.closing
+                      : isStopped ? t.status.stopped
+                      : isOpened  ? t.status.opened
+                      : isPartial ? t.status.partial(pos)
+                      : t.status.closed;
+    const statusColor = isOpening ? '#22dd88'
+                      : isClosing ? '#33aaff'
+                      : isStopped ? '#ff5555'
+                      : isOpened  ? '#00ffcc'
+                      : isPartial ? '#ffaa00'
+                      : '#00ccaa';
+    const subText     = isOpening ? (t.sub.opening || 'Motor tiến · Cuộn lên')
+                      : isClosing ? (t.sub.closing || 'Motor lùi · Cuộn xuống')
+                      : isStopped ? t.sub.stopped
+                      : isOpened  ? t.sub.opened
+                      : isPartial ? t.sub.partial(pos)
+                      : t.sub.closed;
+
+    // Shutter geometry
+    const SLAT_COUNT  = 11;
+    const SLAT_H      = 11;
+    const SLAT_PITCH  = 12;
+    const OPENING_TOP = 230;
+    const OPENING_H   = 128;
+    const OPENING_L   = 115;
+    const OPENING_W   = 312;
+    const DOOR_BOTTOM = 372;
+    const scrolled    = (pos / 100) * (OPENING_H + 22);
+    const doorBottomY = DOOR_BOTTOM - scrolled;
+    const visibleTop  = Math.max(OPENING_TOP, doorBottomY);
+    const visibleH    = Math.max(0, DOOR_BOTTOM - visibleTop);
+
+    let slatsSvg = '';
+    for (let i = 0; i < SLAT_COUNT; i++) {
+      const baseY = OPENING_TOP + OPENING_H - SLAT_H - (i * SLAT_PITCH);
+      const y     = baseY - scrolled;
+      const lum   = 185 + i * 2;
+      const fill  = `rgb(${lum},${lum - 8},${lum - 22})`;
+      slatsSvg += `<rect x="${OPENING_L}" y="${y}" width="${OPENING_W}" height="${SLAT_H}" rx="1" fill="${fill}" stroke="#aea496" stroke-width="0.5"/>`;
+      slatsSvg += `<rect x="${OPENING_L + 4}" y="${y + 1}" width="${OPENING_W - 8}" height="3" rx="1" fill="rgba(255,255,255,0.2)"/>`;
+      slatsSvg += `<rect x="${OPENING_L + 4}" y="${y + SLAT_H - 3}" width="${OPENING_W - 8}" height="2" rx="1" fill="rgba(0,0,0,0.1)"/>`;
+      if (i >= SLAT_COUNT - 3) {
+        for (let v = 0; v < 5; v++) {
+          slatsSvg += `<rect x="${OPENING_L + 16 + v * 58}" y="${y + 2.5}" width="40" height="6" rx="1" fill="rgba(0,0,0,0.32)" stroke="#8a8070" stroke-width="0.4"/>`;
+        }
+      }
+      if (i === 0) {
+        const lkOp = pos <= 1 ? '1' : '0';
+        slatsSvg += `<rect x="${OPENING_L + OPENING_W / 2 - 30}" y="${y}" width="60" height="${SLAT_H}" rx="3" fill="rgba(0,200,120,0.28)" stroke="rgba(0,220,140,0.65)" stroke-width="1" opacity="${lkOp}"/>`;
+      }
+    }
+
+    const glowOp    = lightOn ? '0.9' : '0';
+    const bulbFill  = lightOn ? '#ffe880' : '#1a1208';
+    const glassFill = lightOn ? '#fff4aa' : '#0d1520';
+
+    const motorDot  = isMoving ? '' : `<circle cx="403" cy="221" r="4.5" fill="#1a0a0a" stroke="#2a1818" stroke-width="0.7"/>`;
+    const arrowUp   = isOpening ? `<g style="animation:shutterBlink 0.55s ease-in-out infinite"><polygon points="368,224 376,214 384,224 381,224 381,228 371,228 371,224" fill="#22dd88"/></g>` : '';
+    const arrowDown = isClosing ? `<g style="animation:shutterBlink 0.55s ease-in-out infinite"><polygon points="368,216 376,226 384,216 381,216 381,213 371,213 371,216" fill="#33aaff"/></g>` : '';
+
+    return `
+<defs>
+  <clipPath id="haDoorOpenClip"><rect x="113" y="${visibleTop}" width="316" height="${visibleH}"/></clipPath>
+  <clipPath id="haDoorClip"><rect x="105" y="230" width="330" height="152"/></clipPath>
+  <pattern id="haLouverPat" x="0" y="0" width="28" height="11" patternUnits="userSpaceOnUse">
+    <rect x="0" y="0" width="28" height="11" fill="#b8bec8"/>
+    <rect x="0" y="2" width="28" height="6" rx="1" fill="#8a9aaa" stroke="#7a8898" stroke-width="0.5"/>
+    <rect x="0" y="0" width="28" height="1.5" fill="#ccd2da"/>
+  </pattern>
+  <clipPath id="haGableClip"><polygon points="252,162 408,162 330,78"/></clipPath>
+  <radialGradient id="haGlow" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#fff8c0" stop-opacity="1"/>
+    <stop offset="40%" stop-color="#ffdd44" stop-opacity="0.55"/>
+    <stop offset="100%" stop-color="#ffaa00" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="haCarBody" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#d4c9a8"/><stop offset="50%" stop-color="#c8bc98"/><stop offset="100%" stop-color="#a89878"/>
+  </linearGradient>
+  <linearGradient id="haCarRoof" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#b8ae90"/><stop offset="100%" stop-color="#9a9070"/>
+  </linearGradient>
+  <linearGradient id="haRearWin" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#1a2838"/><stop offset="100%" stop-color="#0a1420"/>
+  </linearGradient>
+</defs>
+<style>@keyframes shutterBlink{0%,100%{opacity:1}50%{opacity:0.3}}</style>
+<!-- SKY -->
+<rect x="0" y="0" width="660" height="290" fill="#8ab8d8"/>
+<rect x="0" y="0" width="660" height="140" fill="#aacce8" opacity="0.45"/>
+<g opacity="0.82"><ellipse cx="520" cy="40" rx="55" ry="17" fill="white"/><ellipse cx="550" cy="29" rx="36" ry="15" fill="white"/><ellipse cx="488" cy="32" rx="30" ry="13" fill="white"/></g>
+<g opacity="0.72"><ellipse cx="140" cy="30" rx="48" ry="15" fill="white"/><ellipse cx="166" cy="20" rx="30" ry="13" fill="white"/></g>
+<!-- FLAG -->
+<rect x="26" y="282" width="12" height="16" rx="2" fill="#8a9098"/>
+<rect x="29" y="96" width="4" height="188" fill="#c8d0d8"/>
+<circle cx="31" cy="94" r="4" fill="#d8c060"/>
+<rect x="33" y="96" width="42" height="25" rx="1.5" fill="#da251d"/>
+<polygon points="54,101 56,106.5 62,106.5 57.5,109.5 59.2,115 54,112 48.8,115 50.5,109.5 46,106.5 52,106.5" fill="#ffff00"/>
+<!-- GROUND -->
+<rect x="0" y="370" width="660" height="40" fill="#5a6270"/>
+<line x1="0" y1="370" x2="660" y2="370" stroke="#4a5260" stroke-width="1.5"/>
+<line x1="0" y1="388" x2="660" y2="388" stroke="#505868" stroke-width="0.5" stroke-dasharray="28,14"/>
+<!-- WALLS -->
+<rect x="85" y="248" width="490" height="124" fill="#cfc4ae"/>
+<rect x="85" y="162" width="490" height="90" fill="#d4c9b4"/>
+<rect x="85" y="246" width="490" height="5" fill="#b8ad98"/>
+<rect x="85" y="182" width="490" height="1.5" fill="rgba(0,0,0,0.07)"/>
+<rect x="85" y="202" width="490" height="1.5" fill="rgba(0,0,0,0.07)"/>
+<rect x="85" y="222" width="490" height="1.5" fill="rgba(0,0,0,0.05)"/>
+<!-- Balcony -->
+<rect x="455" y="168" width="118" height="80" fill="#c8bda8"/>
+<rect x="455" y="240" width="118" height="5" rx="1" fill="#9a9080"/>
+<rect x="455" y="168" width="118" height="5" rx="1" fill="#9a9080"/>
+<line x1="470" y1="173" x2="470" y2="245" stroke="#9a9080" stroke-width="1.5"/>
+<line x1="486" y1="173" x2="486" y2="245" stroke="#9a9080" stroke-width="1.5"/>
+<line x1="502" y1="173" x2="502" y2="245" stroke="#9a9080" stroke-width="1.5"/>
+<line x1="518" y1="173" x2="518" y2="245" stroke="#9a9080" stroke-width="1.5"/>
+<line x1="534" y1="173" x2="534" y2="245" stroke="#9a9080" stroke-width="1.5"/>
+<line x1="550" y1="173" x2="550" y2="245" stroke="#9a9080" stroke-width="1.5"/>
+<!-- ROOF -->
+<polygon points="72,162 330,60 588,162" fill="#d0cec8"/>
+<polygon points="72,162 330,60 330,162" fill="#c2c0ba"/>
+<polygon points="330,60 588,162 330,162" fill="#d8d6d0"/>
+<polygon points="72,162 330,60 588,162 575,162 330,68 85,162" fill="#e8e4dc"/>
+<rect x="72" y="160" width="516" height="7" fill="#e0ddd6" stroke="#c8c4bc" stroke-width="0.5"/>
+<rect x="72" y="165" width="516" height="5" rx="2" fill="#b8b4ac" stroke="#a8a49c" stroke-width="0.6"/>
+<line x1="72" y1="162" x2="330" y2="60" stroke="#b8b4ac" stroke-width="2.5"/>
+<line x1="330" y1="60" x2="588" y2="162" stroke="#c8c4bc" stroke-width="2.5"/>
+<polygon points="252,162 408,162 330,78" fill="#dedad4" stroke="#c0bcb4" stroke-width="1.5"/>
+<g clip-path="url(#haGableClip)"><rect x="252" y="78" width="156" height="84" fill="url(#haLouverPat)"/></g>
+<line x1="260" y1="162" x2="330" y2="86" stroke="#c8c4bc" stroke-width="1.2"/>
+<line x1="400" y1="162" x2="330" y2="86" stroke="#c8c4bc" stroke-width="1.2"/>
+<polygon points="321,86 339,86 343,97 330,105 317,97" fill="#d0ccc4" stroke="#b8b4ac" stroke-width="1"/>
+<!-- MOTOR BOX -->
+<rect x="103" y="212" width="336" height="18" rx="4" fill="#1e2a38" stroke="#2e3a50" stroke-width="0.8"/>
+<rect x="107" y="215" width="328" height="12" rx="2" fill="rgba(0,0,0,0.45)"/>
+<text x="116" y="225" font-size="8" fill="#5a9adf" font-family="monospace" letter-spacing="2.5" font-weight="bold">${(this._config.home_name || 'MY HOME').toUpperCase().substring(0,28)}</text>
+${motorDot}${arrowUp}${arrowDown}
+<!-- GARAGE DOOR FRAME -->
+<rect x="103" y="228" width="336" height="144" rx="2" fill="#5a6068"/>
+<rect x="103" y="228" width="10" height="144" fill="#4a5058"/>
+<rect x="429" y="228" width="10" height="144" fill="#4a5058"/>
+<rect x="103" y="369" width="336" height="6" rx="1" fill="#3a4048"/>
+<!-- INTERIOR + CAR (clipped by shutter opening) -->
+<g clip-path="url(#haDoorOpenClip)">
+  <rect x="113" y="230" width="316" height="140" fill="#1a1e24"/>
+  <rect x="113" y="350" width="316" height="22" fill="#252830"/>
+  <rect x="113" y="350" width="316" height="2" fill="#303440"/>
+  <ellipse cx="271" cy="363" rx="90" ry="4" fill="rgba(0,0,0,0.5)"/>
+  <!-- Glow lamps -->
+  <circle cx="122" cy="262" r="34" fill="url(#haGlow)" opacity="${glowOp}"/>
+  <circle cx="420" cy="262" r="34" fill="url(#haGlow)" opacity="${glowOp}"/>
+  <!-- WHEELS (behind car body) -->
+  <!-- Left rear wheel -->
+  <rect x="178" y="330" width="24" height="34" rx="4" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.2"/>
+  <line x1="184" y1="332" x2="184" y2="362" stroke="#3a3a3a" stroke-width="2"/>
+  <line x1="190" y1="332" x2="190" y2="362" stroke="#3a3a3a" stroke-width="2"/>
+  <line x1="196" y1="332" x2="196" y2="362" stroke="#3a3a3a" stroke-width="2"/>
+  <!-- Right rear wheel -->
+  <rect x="340" y="330" width="24" height="34" rx="4" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.2"/>
+  <line x1="346" y1="332" x2="346" y2="362" stroke="#3a3a3a" stroke-width="2"/>
+  <line x1="352" y1="332" x2="352" y2="362" stroke="#3a3a3a" stroke-width="2"/>
+  <line x1="358" y1="332" x2="358" y2="362" stroke="#3a3a3a" stroke-width="2"/>
+  <!-- CAR body scaled -->
+  <g transform="translate(271,295) scale(0.82) translate(-271,-295)">
+    <!-- Bumper / undercarriage -->
+    <rect x="163" y="338" width="216" height="20" rx="5" fill="#222228" stroke="#18181e" stroke-width="1"/>
+    <rect x="180" y="342" width="182" height="13" rx="2" fill="#1a1a20"/>
+    <!-- Tail lights housing left -->
+    <rect x="165" y="340" width="14" height="16" rx="2" fill="#bb1010"/>
+    <!-- Tail lights housing right -->
+    <rect x="363" y="340" width="14" height="16" rx="2" fill="#bb1010"/>
+    <!-- Wheel arches (4 small ellipses for dual rear) -->
+    <ellipse cx="190" cy="354" rx="7" ry="5" fill="#505050" stroke="#777" stroke-width="1"/>
+    <ellipse cx="190" cy="354" rx="4" ry="3" fill="#1a1a1a"/>
+    <ellipse cx="204" cy="354" rx="7" ry="5" fill="#505050" stroke="#777" stroke-width="1"/>
+    <ellipse cx="204" cy="354" rx="4" ry="3" fill="#1a1a1a"/>
+    <ellipse cx="338" cy="354" rx="7" ry="5" fill="#505050" stroke="#777" stroke-width="1"/>
+    <ellipse cx="338" cy="354" rx="4" ry="3" fill="#1a1a1a"/>
+    <ellipse cx="352" cy="354" rx="7" ry="5" fill="#505050" stroke="#777" stroke-width="1"/>
+    <ellipse cx="352" cy="354" rx="4" ry="3" fill="#1a1a1a"/>
+    <!-- Car body -->
+    <path d="M163,262 Q161,290 161,338 L381,338 Q381,290 379,262 Z" fill="url(#haCarBody)"/>
+    <!-- Body highlight -->
+    <path d="M176,264 Q175,288 175,318 L367,318 Q367,288 367,264 Z" fill="rgba(255,255,255,0.07)"/>
+    <!-- Boot / trunk lid -->
+    <path d="M178,250 Q180,241 271,235 Q362,241 364,250 L366,268 Q330,263 271,261 Q212,263 176,268 Z" fill="url(#haCarBody)" stroke="#b0a888" stroke-width="0.5"/>
+    <!-- Trunk highlight -->
+    <path d="M194,247 Q240,240 271,238 Q302,240 348,247" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="1.8"/>
+    <!-- Rear window -->
+    <path d="M196,250 Q215,224 271,218 Q327,224 346,250 L342,254 Q323,231 271,225 Q219,231 200,254 Z" fill="url(#haRearWin)" stroke="#777" stroke-width="0.8"/>
+    <!-- Rear window wiper -->
+    <line x1="224" y1="248" x2="318" y2="242" stroke="#444" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Roof spoiler strip -->
+    <path d="M210,250 Q271,241 332,250 L329,246 Q271,237 213,246 Z" fill="#a09060" stroke="#887848" stroke-width="0.5"/>
+    <!-- Roof -->
+    <path d="M174,250 L196,250 Q215,224 271,218 Q327,224 346,250 L368,250 L365,262 Q330,255 271,253 Q212,255 177,262 Z" fill="url(#haCarRoof)"/>
+    <!-- LEFT tail light full assembly -->
+    <path d="M161,266 Q159,276 159,298 L178,296 Q177,276 178,266 Z" fill="#cc1111" stroke="#990000" stroke-width="0.8"/>
+    <rect x="161" y="270" width="14" height="22" rx="1" fill="#ff3333" opacity="0.85"/>
+    <line x1="163" y1="273" x2="173" y2="273" stroke="#ff8888" stroke-width="1.2"/>
+    <line x1="163" y1="277" x2="173" y2="277" stroke="#ff8888" stroke-width="1.2"/>
+    <line x1="163" y1="281" x2="173" y2="281" stroke="#ff8888" stroke-width="1.2"/>
+    <line x1="163" y1="285" x2="173" y2="285" stroke="#ff8888" stroke-width="1.2"/>
+    <line x1="163" y1="289" x2="173" y2="289" stroke="#ff8888" stroke-width="1.2"/>
+    <path d="M161,266 Q159,276 159,298 L178,296 Q177,276 178,266 Z" fill="none" stroke="#c0b8a0" stroke-width="1"/>
+    <!-- RIGHT tail light full assembly -->
+    <path d="M381,266 Q383,276 383,298 L364,296 Q365,276 364,266 Z" fill="#cc1111" stroke="#990000" stroke-width="0.8"/>
+    <rect x="367" y="270" width="14" height="22" rx="1" fill="#ff3333" opacity="0.85"/>
+    <line x1="369" y1="273" x2="379" y2="273" stroke="#ff8888" stroke-width="1.2"/>
+    <line x1="369" y1="277" x2="379" y2="277" stroke="#ff8888" stroke-width="1.2"/>
+    <line x1="369" y1="281" x2="379" y2="281" stroke="#ff8888" stroke-width="1.2"/>
+    <line x1="369" y1="285" x2="379" y2="285" stroke="#ff8888" stroke-width="1.2"/>
+    <line x1="369" y1="289" x2="379" y2="289" stroke="#ff8888" stroke-width="1.2"/>
+    <path d="M381,266 Q383,276 383,298 L364,296 Q365,276 364,266 Z" fill="none" stroke="#c0b8a0" stroke-width="1"/>
+    <!-- Rear light bar across -->
+    <rect x="178" y="294" width="186" height="5" rx="1" fill="#dd1111"/>
+    <rect x="180" y="295" width="182" height="3" rx="1" fill="#ff4444" opacity="0.6"/>
+    <!-- Body crease line -->
+    <rect x="180" y="262" width="182" height="2.5" rx="1" fill="#c8c4a8" opacity="0.65"/>
+    <!-- TOYOTA LOGO — correct interlocked 3-oval design -->
+    <circle cx="271" cy="272" r="14" fill="#1a1a20" stroke="#c0b898" stroke-width="1.5"/>
+    <!-- outer horizontal big oval -->
+    <ellipse cx="271" cy="272" rx="11" ry="7.5" fill="none" stroke="#c0b898" stroke-width="1.6"/>
+    <!-- left inner vertical oval -->
+    <ellipse cx="268" cy="272" rx="4.8" ry="7" fill="none" stroke="#c0b898" stroke-width="1.6"/>
+    <!-- right inner vertical oval -->
+    <ellipse cx="274" cy="272" rx="4.8" ry="7" fill="none" stroke="#c0b898" stroke-width="1.6"/>
+    <!-- center horizontal line (crossbar of T) -->
+    <line x1="260" y1="265" x2="282" y2="265" stroke="#c0b898" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- VIOS badge -->
+    <text x="220" y="275" font-size="10.5" fill="#d8d8d8" font-family="Arial" font-weight="bold" letter-spacing="2" text-anchor="end" stroke="#666" stroke-width="0.6" paint-order="stroke">VIOS</text>
+    <!-- LICENSE PLATE -->
+    <rect x="233" y="314" width="76" height="30" rx="3" fill="#181820" stroke="#777" stroke-width="0.8"/>
+    <rect x="236" y="317" width="70" height="24" rx="2" fill="#f0f0f0" stroke="#2233bb" stroke-width="1.4"/>
+    <rect x="236" y="317" width="15" height="24" rx="2" fill="#cc0000"/>
+    <text x="243.5" y="324" font-size="5" fill="white" font-family="Arial" font-weight="bold" text-anchor="middle">VN</text>
+    <text x="243.5" y="335" font-size="8" fill="#FFD700" font-family="Arial" text-anchor="middle">★</text>
+    <text x="279" y="328" text-anchor="middle" font-size="9.5" fill="#111" font-family="Arial Black" font-weight="900" letter-spacing="1">${this._config.plate_line1||'99A'}</text>
+    <text x="279" y="338" text-anchor="middle" font-size="9.5" fill="#111" font-family="Arial Black" font-weight="900" letter-spacing="0.5">${this._config.plate_line2||'873.76'}</text>
+    <circle cx="239" cy="319" r="1.2" fill="#aaa"/>
+    <circle cx="304" cy="319" r="1.2" fill="#aaa"/>
+    <circle cx="239" cy="339" r="1.2" fill="#aaa"/>
+    <circle cx="304" cy="339" r="1.2" fill="#aaa"/>
+    <!-- EXHAUST PIPES (bô xe) -->
+    <ellipse cx="192" cy="356" rx="7" ry="5" fill="#303030" stroke="#555" stroke-width="1"/>
+    <ellipse cx="192" cy="356" rx="5" ry="3.5" fill="#1a1a1a"/>
+    <ellipse cx="192" cy="356" rx="3" ry="2" fill="#111" stroke="#444" stroke-width="0.5"/>
+    <ellipse cx="350" cy="356" rx="7" ry="5" fill="#303030" stroke="#555" stroke-width="1"/>
+    <ellipse cx="350" cy="356" rx="5" ry="3.5" fill="#1a1a1a"/>
+    <ellipse cx="350" cy="356" rx="3" ry="2" fill="#111" stroke="#444" stroke-width="0.5"/>
+  </g>
+</g>
+<!-- SHUTTER SLATS -->
+<g clip-path="url(#haDoorClip)">${slatsSvg}</g>
+<!-- PEDESTRIAN DOOR -->
+<rect x="442" y="252" width="72" height="120" rx="3" fill="#cec4ae"/>
+<rect x="444" y="254" width="68" height="116" rx="2" fill="#d8ceb8" stroke="#aaa090" stroke-width="1.2"/>
+<rect x="458" y="264" width="12" height="96" rx="2" fill="#3a4858"/>
+<rect x="474" y="264" width="12" height="96" rx="2" fill="#3a4858"/>
+<rect x="490" y="264" width="12" height="96" rx="2" fill="#3a4858"/>
+<rect x="448" y="304" width="7" height="18" rx="3" fill="#888078"/>
+<!-- WALL LAMPS -->
+<rect x="113" y="230" width="18" height="28" rx="3" fill="#2a3240" stroke="#3a4250" stroke-width="0.8"/>
+<polygon points="113,242 131,242 128,258 116,258" fill="#1e2838" stroke="#2e3848" stroke-width="0.7"/>
+<rect x="115" y="243" width="12" height="10" rx="1" fill="${glassFill}"/>
+<ellipse cx="122" cy="248" rx="4" ry="3" fill="${bulbFill}"/>
+<rect x="411" y="230" width="18" height="28" rx="3" fill="#2a3240" stroke="#3a4250" stroke-width="0.8"/>
+<polygon points="411,242 429,242 426,258 414,258" fill="#1e2838" stroke="#2e3848" stroke-width="0.7"/>
+<rect x="413" y="243" width="12" height="10" rx="1" fill="${glassFill}"/>
+<ellipse cx="420" cy="248" rx="4" ry="3" fill="${bulbFill}"/>
+<!-- POSITION inside SVG (subtle) -->
+<text x="330" y="395" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.22)" font-family="monospace" letter-spacing="1">${t.position(pos)}</text>`;
   }
 
   _bindEvents() {
@@ -922,7 +1453,7 @@ ${motorDot}${arrowO}${arrowC}
     requestAnimationFrame(() => this._syncCamera());
   }
 
-  getCardSize() { return Math.ceil((parseInt(this._config.card_height,10)||320) / 50); }
+  getCardSize() { return 7; }
   static getConfigElement() { return document.createElement('gate-card-editor'); }
   static getStubConfig()    { return { ...DEFAULT_CONFIG }; }
 }
@@ -936,7 +1467,7 @@ class GateCardEditor extends HTMLElement {
     this.attachShadow({ mode: 'open' });
     this._config = { ...DEFAULT_CONFIG };
     this._hass   = null;
-    this._open   = { name: true, lang: true, bg: true, colors: false, size: false, entities: true };
+    this._open   = { name: true, lang: true, bg: true, colors: false, style: true, entities: true };
     this._picker = null;
   }
 
@@ -1110,33 +1641,13 @@ class GateCardEditor extends HTMLElement {
 </style>
 <div class="editor">
   <div class="credit">🚧 <strong>Gate Card</strong>
-    <span style="color:var(--secondary-text-color);font-weight:400;">V1.0 · Designed by @doanlong1412 from 🇻🇳 Vietnam</span>
+    <span style="color:var(--secondary-text-color);font-weight:400;">v1.1 Designed by @doanlong1412 from 🇻🇳 Vietnam</span>
   </div>
 
-  <!-- Gate name & zone -->
-  <div class="acc-wrap">
-    <div class="acc-head" id="head-name">
-      <ha-icon icon="mdi:tag-edit-outline"></ha-icon> Tên cổng
-      <span class="acc-arrow" id="arrow-name">${this._open.name?'▾':'▸'}</span>
-    </div>
-    <div class="acc-body" id="body-name" style="display:${this._open.name?'block':'none'}">
-      <div class="row">
-        <label>🚧 Tên cổng (hiển thị trên card)</label>
-        <input class="txt-inp" type="text" id="inp-gate-title"
-          placeholder="${t.title}" value="${cfg.gate_title||''}"/>
-      </div>
-      <div class="row">
-        <label>📍 Zone / mô tả phụ</label>
-        <input class="txt-inp" type="text" id="inp-gate-zone"
-          placeholder="${t.zone}" value="${cfg.gate_zone||''}"/>
-      </div>
-    </div>
-  </div>
-
-  <!-- Language -->
+  <!-- 1. Language -->
   <div class="acc-wrap">
     <div class="acc-head" id="head-lang">
-      <ha-icon icon="mdi:translate"></ha-icon> Ngôn ngữ
+      <ha-icon icon="mdi:translate"></ha-icon> ${t.edLang}
       <span class="acc-arrow" id="arrow-lang">${this._open.lang?'▾':'▸'}</span>
     </div>
     <div class="acc-body" id="body-lang" style="display:${this._open.lang?'block':'none'}">
@@ -1150,7 +1661,144 @@ class GateCardEditor extends HTMLElement {
     </div>
   </div>
 
-  <!-- Background -->
+  <!-- 2. Gate Style -->
+  <div class="acc-wrap">
+    <div class="acc-head" id="head-style">
+      <ha-icon icon="mdi:garage-variant"></ha-icon> ${t.edStyle}
+      <span class="acc-arrow" id="arrow-style">${this._open.style?'▾':'▸'}</span>
+    </div>
+    <div class="acc-body" id="body-style" style="display:${this._open.style?'block':'none'}">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div class="style-btn ${(cfg.gate_style||'slide')==='slide'?'on':''}" data-style="slide" style="cursor:pointer;border-radius:10px;border:2px solid ${(cfg.gate_style||'slide')==='slide'?'var(--primary-color)':'var(--divider-color)'};padding:10px 8px;background:var(--secondary-background-color);display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <svg viewBox="0 0 80 40" width="64" height="32" style="display:block;">
+            <rect x="0" y="5" width="78" height="32" rx="3" fill="#1a2a3a" stroke="#2a4a6a" stroke-width="1"/>
+            <rect x="2" y="7" width="30" height="28" rx="2" fill="#2e4d60" stroke="#3a6070" stroke-width="0.5"/>
+            <rect x="34" y="7" width="4" height="28" rx="1" fill="#2e4d60"/>
+            <rect x="40" y="7" width="4" height="28" rx="1" fill="#2e4d60" opacity="0.4"/>
+            <rect x="2" y="7" width="30" height="4" rx="1" fill="#3a6a7a"/>
+            <rect x="2" y="19" width="30" height="3" rx="1" fill="#3a6a7a" opacity="0.6"/>
+            <rect x="2" y="31" width="30" height="4" rx="1" fill="#3a6a7a"/>
+            <circle cx="70" cy="20" r="4" fill="#1e3050"/>
+            <polygon points="66,20 61,16 61,18.5 55,18.5 55,21.5 61,21.5 61,24" fill="#ff8c00" opacity="0.8"/>
+          </svg>
+          <span style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;color:${(cfg.gate_style||'slide')==='slide'?'var(--primary-color)':'var(--secondary-text-color)'};">${t.edStyleSlide}</span>
+        </div>
+        <div class="style-btn ${(cfg.gate_style||'slide')==='shutter'?'on':''}" data-style="shutter" style="cursor:pointer;border-radius:10px;border:2px solid ${(cfg.gate_style||'slide')==='shutter'?'var(--primary-color)':'var(--divider-color)'};padding:10px 8px;background:var(--secondary-background-color);display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <svg viewBox="0 0 80 40" width="64" height="32" style="display:block;">
+            <rect x="0" y="0" width="80" height="40" rx="3" fill="#1a1e24" stroke="#3a4048" stroke-width="1"/>
+            <rect x="0" y="0" width="80" height="10" rx="2" fill="#b8b4ac"/>
+            <rect x="5" y="11" width="70" height="5" rx="1" fill="#c0b8a8" stroke="#a0a090" stroke-width="0.4"/>
+            <rect x="5" y="18" width="70" height="5" rx="1" fill="#b8b0a0" stroke="#a0a090" stroke-width="0.4"/>
+            <rect x="5" y="25" width="70" height="5" rx="1" fill="#b0a898" stroke="#a0a090" stroke-width="0.4"/>
+            <rect x="5" y="32" width="70" height="5" rx="1" fill="#a8a090" stroke="#a0a090" stroke-width="0.4"/>
+          </svg>
+          <span style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;color:${(cfg.gate_style||'slide')==='shutter'?'var(--primary-color)':'var(--secondary-text-color)'};">${t.edStyleShutter}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Gate name, zone & license plate -->
+  <div class="acc-wrap">
+    <div class="acc-head" id="head-name">
+      <ha-icon icon="mdi:tag-edit-outline"></ha-icon> ${t.edName}
+      <span class="acc-arrow" id="arrow-name">${this._open.name?'▾':'▸'}</span>
+    </div>
+    <div class="acc-body" id="body-name" style="display:${this._open.name?'block':'none'}">
+      <div class="row">
+        <label>${t.edGateTitle}</label>
+        <input class="txt-inp" type="text" id="inp-gate-title"
+          placeholder="${t.title}" value="${cfg.gate_title||''}"/>
+      </div>
+      <div class="row">
+        <label>${t.edGateZone}</label>
+        <input class="txt-inp" type="text" id="inp-gate-zone"
+          placeholder="${t.zone}" value="${cfg.gate_zone||''}"/>
+      </div>
+      <div class="row">
+        <label>${t.edHomeName}</label>
+        <input class="txt-inp" type="text" id="inp-home-name"
+          placeholder="My Home" value="${cfg.home_name||''}"/>
+      </div>
+      <div class="row">
+        <label>${t.edPlate1}</label>
+        <input class="txt-inp" type="text" id="inp-plate-line1"
+          placeholder="99A" maxlength="10" value="${cfg.plate_line1||'99A'}"/>
+      </div>
+      <div class="row">
+        <label>${t.edPlate2}</label>
+        <input class="txt-inp" type="text" id="inp-plate-line2"
+          placeholder="873.76" maxlength="10" value="${cfg.plate_line2||'873.76'}"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Entities -->
+  <div class="acc-wrap">
+    <div class="acc-head" id="head-entities">
+      <ha-icon icon="mdi:lightning-bolt"></ha-icon> ${t.entityLabel}
+      <span class="acc-arrow" id="arrow-entities">${this._open.entities?'▾':'▸'}</span>
+    </div>
+    <div class="acc-body" id="body-entities" style="display:${this._open.entities?'block':'none'}">
+      <div style="padding:4px 0 8px;border-bottom:1px solid var(--divider-color);margin-bottom:6px;">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;padding:4px 0;">
+          <div style="position:relative;width:40px;height:22px;flex-shrink:0;">
+            <span id="toggle-no-sensor" style="
+              position:absolute;inset:0;border-radius:11px;cursor:pointer;transition:background .2s;
+              background:${cfg.no_sensor?'var(--primary-color,#03a9f4)':'rgba(0,0,0,0.12)'};
+              border:1px solid ${cfg.no_sensor?'var(--primary-color,#03a9f4)':'var(--divider-color)'};
+            ">
+              <span style="
+                position:absolute;top:2px;left:${cfg.no_sensor?'20':'2'}px;width:16px;height:16px;
+                border-radius:50%;background:#fff;transition:left .2s;
+                box-shadow:0 1px 3px rgba(0,0,0,0.3);
+              "></span>
+            </span>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;color:var(--primary-text-color);">${t.edNoSensor}</div>
+            <div style="font-size:11px;color:var(--secondary-text-color);margin-top:2px;line-height:1.4;">${t.edNoSensorHint}</div>
+          </div>
+        </label>
+        ${cfg.no_sensor ? `
+        <div style="margin-top:8px;padding:0 2px;">
+          <div style="font-size:12px;font-weight:600;color:var(--secondary-text-color);margin-bottom:6px;">${t.edTravelTime}</div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <input type="range" id="inp-travel-time" min="5" max="120" step="1"
+              value="${cfg.travel_time_sec||20}"
+              style="flex:1;accent-color:var(--primary-color);">
+            <span id="travel-time-val" style="font-family:monospace;font-size:14px;font-weight:700;color:var(--primary-color);min-width:40px;text-align:right;">${cfg.travel_time_sec||20}s</span>
+          </div>
+        </div>` : ''}
+      </div>
+      ${cfg.no_sensor ? '' : this._entityField('entity_gate_position', t.entityGatePos, 'sensor')}
+      ${this._entityField('entity_gate_open',     t.entityGateOpen,  'switch')}
+      ${this._entityField('entity_gate_close',    t.entityGateClose, 'switch')}
+      ${this._entityField('entity_gate_stop',     t.entityGateStop,  'switch')}
+      ${this._entityField('entity_gate_light',    t.entityGateLight, 'switch')}
+      ${this._entityField('entity_camera',        t.entityCamera,    'camera')}
+      ${this._entityField('entity_motion',        t.entityMotion,    'binary_sensor')}
+      ${this._entityField('entity_person',        t.entityPerson,    'binary_sensor')}
+      ${this._entityField('entity_flipped',       t.entityFlipped,   'input_boolean')}
+    </div>
+  </div>
+
+  <!-- 5. Colors -->
+  <div class="acc-wrap">
+    <div class="acc-head" id="head-colors">
+      <ha-icon icon="mdi:format-color-fill"></ha-icon> ${t.colorLabel}
+      <span class="acc-arrow" id="arrow-colors">${this._open.colors?'▾':'▸'}</span>
+    </div>
+    <div class="acc-body" id="body-colors" style="display:${this._open.colors?'block':'none'}">
+      ${this._colorRow('accent_color',    t.accentColor)}
+      ${this._colorRow('text_color',      t.textColor)}
+      ${this._colorRow('btn_open_color',  t.btnOpenColor)}
+      ${this._colorRow('btn_stop_color',  t.btnStopColor)}
+      ${this._colorRow('btn_close_color', t.btnCloseColor)}
+    </div>
+  </div>
+
+  <!-- 6. Background (bottom) -->
   <div class="acc-wrap">
     <div class="acc-head" id="head-bg">
       <ha-icon icon="mdi:palette"></ha-icon> ${t.bgLabel}
@@ -1173,55 +1821,6 @@ class GateCardEditor extends HTMLElement {
       </div>` : ''}
     </div>
   </div>
-
-  <!-- Colors -->
-  <div class="acc-wrap">
-    <div class="acc-head" id="head-colors">
-      <ha-icon icon="mdi:format-color-fill"></ha-icon> ${t.colorLabel}
-      <span class="acc-arrow" id="arrow-colors">${this._open.colors?'▾':'▸'}</span>
-    </div>
-    <div class="acc-body" id="body-colors" style="display:${this._open.colors?'block':'none'}">
-      ${this._colorRow('accent_color',    t.accentColor)}
-      ${this._colorRow('text_color',      t.textColor)}
-      ${this._colorRow('btn_open_color',  t.btnOpenColor)}
-      ${this._colorRow('btn_stop_color',  t.btnStopColor)}
-      ${this._colorRow('btn_close_color', t.btnCloseColor)}
-    </div>
-  </div>
-
-  <!-- Size -->
-  <div class="acc-wrap">
-    <div class="acc-head" id="head-size">
-      <ha-icon icon="mdi:resize"></ha-icon> ${t.sizeLabel}
-      <span class="acc-arrow" id="arrow-size">${this._open.size?'▾':'▸'}</span>
-    </div>
-    <div class="acc-body" id="body-size" style="display:${this._open.size?'block':'none'}">
-      <div class="sl-row">
-        <label>${t.cardHeight}</label>
-        <input type="range" id="hslider" min="200" max="600" step="10" value="${cfg.card_height||320}"/>
-        <span class="slv" id="hval">${cfg.card_height||320}px</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Entities -->
-  <div class="acc-wrap">
-    <div class="acc-head" id="head-entities">
-      <ha-icon icon="mdi:lightning-bolt"></ha-icon> ${t.entityLabel}
-      <span class="acc-arrow" id="arrow-entities">${this._open.entities?'▾':'▸'}</span>
-    </div>
-    <div class="acc-body" id="body-entities" style="display:${this._open.entities?'block':'none'}">
-      ${this._entityField('entity_gate_position', t.entityGatePos,   'sensor')}
-      ${this._entityField('entity_gate_open',     t.entityGateOpen,  'switch')}
-      ${this._entityField('entity_gate_close',    t.entityGateClose, 'switch')}
-      ${this._entityField('entity_gate_stop',     t.entityGateStop,  'switch')}
-      ${this._entityField('entity_gate_light',    t.entityGateLight, 'switch')}
-      ${this._entityField('entity_camera',        t.entityCamera,    'camera')}
-      ${this._entityField('entity_motion',        t.entityMotion,    'binary_sensor')}
-      ${this._entityField('entity_person',        t.entityPerson,    'binary_sensor')}
-      ${this._entityField('entity_flipped',       t.entityFlipped,   'input_boolean')}
-    </div>
-  </div>
 </div>`;
 
     this._bindEditorEvents();
@@ -1232,7 +1831,7 @@ class GateCardEditor extends HTMLElement {
     const sr = this.shadowRoot;
 
     // accordion headers
-    ['name','lang','bg','colors','size','entities'].forEach(id => {
+    ['name','lang','bg','colors','style','entities'].forEach(id => {
       const hdr = sr.getElementById('head-' + id);
       if (hdr) hdr.addEventListener('click', () => this._toggleSection(id));
     });
@@ -1300,18 +1899,13 @@ class GateCardEditor extends HTMLElement {
         this._render();
       }));
 
-    // height slider
-    const slider = sr.getElementById('hslider');
-    const valEl  = sr.getElementById('hval');
-    if (slider) {
-      slider.addEventListener('input', () => {
-        if (valEl) valEl.textContent = slider.value + 'px';
-      });
-      slider.addEventListener('change', () => {
-        this._config = { ...this._config, card_height: parseInt(slider.value, 10) };
+    // gate style buttons
+    sr.querySelectorAll('[data-style]').forEach(btn =>
+      btn.addEventListener('click', () => {
+        this._config = { ...this._config, gate_style: btn.dataset.style };
         this._fire();
-      });
-    }
+        this._render();
+      }));
 
     // gate title / zone text inputs — update state on every keystroke but only fire on blur/Enter
     const titleInp = sr.getElementById('inp-gate-title');
@@ -1336,6 +1930,41 @@ class GateCardEditor extends HTMLElement {
     };
     wireTextInput(titleInp, 'gate_title');
     wireTextInput(zoneInp,  'gate_zone');
+
+    const homeNameInp = sr.getElementById('inp-home-name');
+    wireTextInput(homeNameInp, 'home_name');
+
+    const plate1Inp = sr.getElementById('inp-plate-line1');
+    const plate2Inp = sr.getElementById('inp-plate-line2');
+    wireTextInput(plate1Inp, 'plate_line1');
+    wireTextInput(plate2Inp, 'plate_line2');
+
+    // no-sensor toggle
+    const noSensorToggle = sr.getElementById('toggle-no-sensor');
+    const noSensorChk    = sr.getElementById('chk-no-sensor');
+    if (noSensorToggle && noSensorChk) {
+      const doToggle = () => {
+        const val = !this._config.no_sensor;
+        this._config = { ...this._config, no_sensor: val };
+        this._fire();
+        this._render();
+      };
+      noSensorToggle.addEventListener('click', doToggle);
+    }
+
+    // travel time slider — live preview, fire on change
+    const travelSlider = sr.getElementById('inp-travel-time');
+    const travelVal    = sr.getElementById('travel-time-val');
+    if (travelSlider) {
+      travelSlider.addEventListener('input', () => {
+        this._config = { ...this._config, travel_time_sec: parseInt(travelSlider.value) };
+        if (travelVal) travelVal.textContent = travelSlider.value + 's';
+      });
+      travelSlider.addEventListener('change', () => {
+        this._config = { ...this._config, travel_time_sec: parseInt(travelSlider.value) };
+        this._fire();
+      });
+    }
 
     // ha-entity-picker — listen for value-changed (native HA event)
     sr.querySelectorAll('ha-entity-picker').forEach(picker =>
