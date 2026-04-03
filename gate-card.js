@@ -784,7 +784,7 @@ class GateCard extends HTMLElement {
 .flip-btn:active{filter:brightness(1.3);}
 .light-btn{margin:0 12px 10px 18px;display:inline-flex;align-items:center;gap:7px;
   padding:5px 12px;border-radius:8px;cursor:pointer;backdrop-filter:blur(4px);flex-shrink:0;}
-.svg-wrap{padding:6px 8px 0;flex-shrink:0;}
+.svg-wrap{padding:0;flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;}
 .status-row{display:flex;align-items:center;gap:8px;padding:5px 8px 2px;flex-shrink:0;}
 .warn-scroll{overflow:hidden;white-space:nowrap;flex-shrink:0;padding:2px 8px 3px;
   font-size:10px;letter-spacing:1.5px;color:#c8861a;}
@@ -1032,7 +1032,7 @@ class GateCard extends HTMLElement {
     return `
 <div class="back">
   <div class="svg-wrap">
-    <svg id="b-svg" viewBox="${isShutter ? '0 0 660 390' : '0 0 560 175'}" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;margin:0 auto;max-height:${isShutter?'220px':'130px'}">
+    <svg id="b-svg" viewBox="${isShutter ? '0 0 660 390' : '0 0 560 175'}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="display:block;width:100%;height:100%;flex:1;min-height:0;">
       ${isShutter ? this._svgShutter(0, false, false, false, true, false, initLight) : this._svgInner(0, false, false, false, true, false, initLight)}
     </svg>
     <div class="status-row">
@@ -1673,7 +1673,7 @@ class GateCardEditor extends HTMLElement {
 </style>
 <div class="editor">
   <div class="credit">🚧 <strong>Gate Card</strong>
-    <span style="color:var(--secondary-text-color);font-weight:400;">v1.1.1 Designed by @doanlong1412 from 🇻🇳 Vietnam</span>
+    <span style="color:var(--secondary-text-color);font-weight:400;">v1.1 Designed by @doanlong1412 from 🇻🇳 Vietnam</span>
   </div>
 
   <!-- 1. Language -->
