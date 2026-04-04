@@ -1,9 +1,26 @@
 /**
  * Gate Card — Custom Home Assistant Lovelace Card
- * v1.1.0 Designed by @doanlong1412 from 🇻🇳 Vietnam
+ * v1.2.0 Designed by @doanlong1412 from 🇻🇳 Vietnam
  * HACS-compatible Web Component
  *
- * ─── What's new in v1.1.0 ────────────────────────────────────────────────────
+ * ─── What's new in v1.2.0 ────────────────────────────────────────────────────
+ *  🔴 Timer mode — màu đỏ dễ nhìn hơn
+ *      Badge ⏱ TIMER đổi từ vàng → đỏ tươi.
+ *      Chữ % và thanh progress fill cũng đổi sang đỏ khi đang chạy timer,
+ *      giúp phân biệt rõ ràng với chế độ cảm biến thật.
+ *
+ *  🔵 Sensor mode — màu xanh da trời
+ *      Chữ % khi dùng cảm biến vị trí thật đổi sang xanh da trời (#38bdf8)
+ *      thay vì cyan nhạt, tương phản tốt hơn trên mọi nền.
+ *
+ *  🔐 use_lock — Công tắc khóa cổng thông minh
+ *      Thêm toggle "Dùng khóa cổng" trong Visual Editor.
+ *      Khi bật: nếu entity_gate_lock đang ON thì nút Mở cổng
+ *      bị vô hiệu hóa hoàn toàn (UI mờ + chặn event handler),
+ *      ngăn mở cổng khi khóa chưa được mở.
+ *      Hỗ trợ đầy đủ tất cả 10 ngôn ngữ.
+ *
+ * ─── Previous: v1.1.0 ────────────────────────────────────────────────────────
  *  🏠 gate_style: 'shutter'  — Rolling shutter / garage door diagram
  *      Animated slats (roll up/down with real position), house facade,
  *      Vietnamese flag, car inside garage, glowing wall lamps when light is on,
@@ -54,7 +71,7 @@ const TRANSLATIONS = {
     light: on => `ĐÈN CỔNG · ${on?'BẬT':'TẮT'}`,
     motion: 'Chuyển động:', person: 'Người:',
     control: 'ĐIỀU KHIỂN ▶', back: '◀ QUAY LẠI',
-    open: 'Mở', stop: 'Dừng', close: 'Đóng',
+    open: 'Mở Cổng', stop: 'Dừng', close: 'Đóng Cổng',
     warn_open: '⚠️ CỔNG ĐANG MỞ — CHÚ Ý AN TOÀN',
     warn_close: '⚠️ CỔNG ĐANG ĐÓNG — CHÚ Ý AN TOÀN',
     posClose: 'ĐÓNG', posOpen: 'MỞ', position: p => `POSITION ${Math.round(p)}%`,
@@ -65,7 +82,7 @@ const TRANSLATIONS = {
     entityLabel: 'Thực thể (Entity)',
     entityGatePos: '📡 Cảm biến vị trí cổng', entityGateOpen: '🔓 Switch Mở cổng',
     entityGateClose: '🔒 Switch Đóng cổng', entityGateStop: '🛑 Switch Dừng cổng',
-    entityGateLight: '💡 Switch Đèn cổng', entityCamera: '📷 Camera',
+    entityGateLight: '💡 Switch Đèn cổng', entityGateLock: '🔐 Switch Khóa cổng', entityCamera: '📷 Camera',
     entityMotion: '🏃 Cảm biến chuyển động', entityPerson: '👤 Cảm biến người',
     entityFlipped: '🔄 Input Boolean lật card',
     color1: 'Màu 1 (trên trái)', color2: 'Màu 2 (dưới phải)',
@@ -85,6 +102,10 @@ const TRANSLATIONS = {
     edNoSensorHint: 'Bật nếu cổng không có cảm biến vị trí. Card sẽ tính vị trí theo thời gian.',
     edInvertSensor: '🔄 Đảo chiều cảm biến vị trí',
     edInvertSensorHint: 'Bật nếu cảm biến báo ngược (100% = đóng). Card sẽ tự đảo giá trị vị trí.',
+    edPulseSwitch: '⚡ Công tắc nhấn nhả (Pulse)',
+    edPulseSwitchHint: 'Bật nếu relay chỉ bật tầm 1-3s rồi tắt nhưng motor vẫn chạy hết hành trình. Timer sẽ chạy đến cuối bất kể relay tắt.',
+    edUseLock: '🔐 Dùng khóa cổng',
+    edUseLockHint: 'Bật để kích hoạt tính năng khóa. Khi đang bật và trạng thái khóa là ON, nút Mở cổng sẽ bị vô hiệu hóa.',
     lightBtn: 'ĐÈN',
   },
   en: {
@@ -113,7 +134,7 @@ const TRANSLATIONS = {
     entityLabel: 'Entities',
     entityGatePos: '📡 Gate position sensor', entityGateOpen: '🔓 Gate open switch',
     entityGateClose: '🔒 Gate close switch', entityGateStop: '🛑 Gate stop switch',
-    entityGateLight: '💡 Gate light switch', entityCamera: '📷 Camera',
+    entityGateLight: '💡 Gate light switch', entityGateLock: '🔐 Gate lock switch', entityCamera: '📷 Camera',
     entityMotion: '🏃 Motion sensor', entityPerson: '👤 Person sensor',
     entityFlipped: '🔄 Flip state boolean',
     color1: 'Color 1 (top left)', color2: 'Color 2 (bottom right)',
@@ -133,6 +154,10 @@ const TRANSLATIONS = {
     edNoSensorHint: 'Enable if the gate has no position sensor. Position will be estimated by timer.',
     edInvertSensor: '🔄 Invert position sensor',
     edInvertSensorHint: 'Enable if sensor reports reversed values (100% = closed). Card will invert the position.',
+    edPulseSwitch: '⚡ Pulse switch',
+    edPulseSwitchHint: 'Enable if relay only pulses briefly (~1-3s) but motor runs the full travel. Timer runs to completion regardless of relay state.',
+    edUseLock: '🔐 Use gate lock',
+    edUseLockHint: 'Enable to activate lock feature. When on and lock entity is ON, the Open button will be disabled.',
     lightBtn: 'LIGHT',
   },
   de: {
@@ -161,7 +186,7 @@ const TRANSLATIONS = {
     entityLabel: 'Entitäten',
     entityGatePos: '📡 Positionssensor', entityGateOpen: '🔓 Schalter Öffnen',
     entityGateClose: '🔒 Schalter Schließen', entityGateStop: '🛑 Schalter Stopp',
-    entityGateLight: '💡 Schalter Licht', entityCamera: '📷 Kamera',
+    entityGateLight: '💡 Schalter Licht', entityGateLock: '🔐 Schalter Schloss', entityCamera: '📷 Kamera',
     entityMotion: '🏃 Bewegungssensor', entityPerson: '👤 Personensensor',
     entityFlipped: '🔄 Input Boolean Flip',
     color1: 'Farbe 1 (oben links)', color2: 'Farbe 2 (unten rechts)',
@@ -181,6 +206,10 @@ const TRANSLATIONS = {
     edNoSensorHint: 'Aktivieren, wenn kein Positionssensor vorhanden. Position wird per Timer geschätzt.',
     edInvertSensor: '🔄 Positionssensor umkehren',
     edInvertSensorHint: 'Aktivieren, wenn Sensor umgekehrte Werte liefert (100% = geschlossen).',
+    edPulseSwitch: '⚡ Impulsschalter (Pulse)',
+    edPulseSwitchHint: 'Aktivieren wenn Relais nur kurz (~1-3s) schaltet, Motor aber volle Strecke fährt.',
+    edUseLock: '🔐 Schloss verwenden',
+    edUseLockHint: 'Aktivieren um das Schloss zu nutzen. Wenn aktiv und Schloss EIN, wird die Öffnen-Taste deaktiviert.',
     lightBtn: 'LICHT',
   },
   fr: {
@@ -209,7 +238,7 @@ const TRANSLATIONS = {
     entityLabel: 'Entités',
     entityGatePos: '📡 Capteur de position', entityGateOpen: '🔓 Interrupteur Ouverture',
     entityGateClose: '🔒 Interrupteur Fermeture', entityGateStop: '🛑 Interrupteur Stop',
-    entityGateLight: '💡 Interrupteur Lumière', entityCamera: '📷 Caméra',
+    entityGateLight: '💡 Interrupteur Lumière', entityGateLock: '🔐 Interrupteur Verrou', entityCamera: '📷 Caméra',
     entityMotion: '🏃 Détecteur de mouvement', entityPerson: '👤 Détecteur de personne',
     entityFlipped: '🔄 Booléen de retournement',
     color1: 'Couleur 1 (haut gauche)', color2: 'Couleur 2 (bas droite)',
@@ -229,6 +258,10 @@ const TRANSLATIONS = {
     edNoSensorHint: 'Activer si le portail n\'a pas de capteur. La position sera estimée par minuterie.',
     edInvertSensor: '🔄 Inverser le capteur de position',
     edInvertSensorHint: 'Activer si le capteur renvoie des valeurs inversées (100% = fermé).',
+    edPulseSwitch: '⚡ Interrupteur impulsion',
+    edPulseSwitchHint: 'Activer si le relais ne pulse que brièvement (~1-3s) mais le moteur fait le trajet complet.',
+    edUseLock: '🔐 Utiliser le verrou',
+    edUseLockHint: 'Activer pour utiliser le verrou. Si actif et verrou ON, le bouton Ouvrir sera désactivé.',
     lightBtn: 'LUMIÈRE',
   },
   nl: {
@@ -257,7 +290,7 @@ const TRANSLATIONS = {
     entityLabel: 'Entiteiten',
     entityGatePos: '📡 Positiesensor', entityGateOpen: '🔓 Schakelaar Openen',
     entityGateClose: '🔒 Schakelaar Sluiten', entityGateStop: '🛑 Schakelaar Stop',
-    entityGateLight: '💡 Schakelaar Licht', entityCamera: '📷 Camera',
+    entityGateLight: '💡 Schakelaar Licht', entityGateLock: '🔐 Schakelaar Slot', entityCamera: '📷 Camera',
     entityMotion: '🏃 Bewegingssensor', entityPerson: '👤 Persoonssensor',
     entityFlipped: '🔄 Invoerbooleaan flip',
     color1: 'Kleur 1 (linksboven)', color2: 'Kleur 2 (rechtsonder)',
@@ -277,6 +310,10 @@ const TRANSLATIONS = {
     edNoSensorHint: 'Inschakelen als de poort geen positiesensor heeft. Positie wordt geschat via timer.',
     edInvertSensor: '🔄 Positiesensor omkeren',
     edInvertSensorHint: 'Inschakelen als sensor omgekeerde waarden geeft (100% = gesloten).',
+    edPulseSwitch: '⚡ Pulsschakelaar',
+    edPulseSwitchHint: 'Inschakelen als relais kort pulst (~1-3s) maar motor volledig doorloopt.',
+    edUseLock: '🔐 Slot gebruiken',
+    edUseLockHint: 'Inschakelen om het slot te activeren. Als ingeschakeld en slot AAN, wordt de Openen-knop uitgeschakeld.',
     lightBtn: 'LICHT',
   },
   pl: {
@@ -305,7 +342,7 @@ const TRANSLATIONS = {
     entityLabel: 'Encje',
     entityGatePos: '📡 Czujnik pozycji', entityGateOpen: '🔓 Przełącznik Otwieranie',
     entityGateClose: '🔒 Przełącznik Zamykanie', entityGateStop: '🛑 Przełącznik Stop',
-    entityGateLight: '💡 Przełącznik Światło', entityCamera: '📷 Kamera',
+    entityGateLight: '💡 Przełącznik Światło', entityGateLock: '🔐 Przełącznik Zamek', entityCamera: '📷 Kamera',
     entityMotion: '🏃 Czujnik ruchu', entityPerson: '👤 Czujnik osoby',
     entityFlipped: '🔄 Wartość logiczna odwrócenia',
     color1: 'Kolor 1 (lewy górny)', color2: 'Kolor 2 (prawy dolny)',
@@ -325,6 +362,10 @@ const TRANSLATIONS = {
     edNoSensorHint: 'Włącz, jeśli brama nie ma czujnika. Pozycja będzie szacowana przez timer.',
     edInvertSensor: '🔄 Odwróć czujnik pozycji',
     edInvertSensorHint: 'Włącz jeśli czujnik podaje odwrócone wartości (100% = zamknięta).',
+    edPulseSwitch: '⚡ Przełącznik impulsowy',
+    edPulseSwitchHint: 'Włącz jeśli przekaźnik działa krótko (~1-3s), a silnik przejeżdża pełen dystans.',
+    edUseLock: '🔐 Używaj zamka',
+    edUseLockHint: 'Włącz aby aktywować zamek. Gdy aktywny i zamek ON, przycisk Otwórz będzie wyłączony.',
     lightBtn: 'ŚWIATŁO',
   },
   sv: {
@@ -353,7 +394,7 @@ const TRANSLATIONS = {
     entityLabel: 'Entiteter',
     entityGatePos: '📡 Positionssensor', entityGateOpen: '🔓 Brytare Öppna',
     entityGateClose: '🔒 Brytare Stänga', entityGateStop: '🛑 Brytare Stopp',
-    entityGateLight: '💡 Brytare Belysning', entityCamera: '📷 Kamera',
+    entityGateLight: '💡 Brytare Belysning', entityGateLock: '🔐 Brytare Lås', entityCamera: '📷 Kamera',
     entityMotion: '🏃 Rörelsesensor', entityPerson: '👤 Personsensor',
     entityFlipped: '🔄 Boolesk flip',
     color1: 'Färg 1 (övre vänster)', color2: 'Färg 2 (nedre höger)',
@@ -373,6 +414,10 @@ const TRANSLATIONS = {
     edNoSensorHint: 'Aktivera om grinden saknar positionssensor. Position beräknas via timer.',
     edInvertSensor: '🔄 Invertera positionssensor',
     edInvertSensorHint: 'Aktivera om sensorn rapporterar omvända värden (100% = stängd).',
+    edPulseSwitch: '⚡ Pulsbrytare',
+    edPulseSwitchHint: 'Aktivera om reläet bara pulserar kort (~1-3s) men motorn kör hela sträckan.',
+    edUseLock: '🔐 Använd lås',
+    edUseLockHint: 'Aktivera för låsfunktion. När aktiv och lås PÅ, inaktiveras Öppna-knappen.',
     lightBtn: 'LJUS',
   },
   hu: {
@@ -401,7 +446,7 @@ const TRANSLATIONS = {
     entityLabel: 'Entitások',
     entityGatePos: '📡 Pozícióérzékelő', entityGateOpen: '🔓 Kapcsoló Nyitás',
     entityGateClose: '🔒 Kapcsoló Zárás', entityGateStop: '🛑 Kapcsoló Stop',
-    entityGateLight: '💡 Kapcsoló Világítás', entityCamera: '📷 Kamera',
+    entityGateLight: '💡 Kapcsoló Világítás', entityGateLock: '🔐 Kapcsoló Zár', entityCamera: '📷 Kamera',
     entityMotion: '🏃 Mozgásérzékelő', entityPerson: '👤 Személyérzékelő',
     entityFlipped: '🔄 Logikai flip',
     color1: 'Szín 1 (bal felső)', color2: 'Szín 2 (jobb alsó)',
@@ -421,6 +466,10 @@ const TRANSLATIONS = {
     edNoSensorHint: 'Aktiváld, ha a kapunak nincs pozícióérzékelője. A pozíció időzítővel lesz becsülve.',
     edInvertSensor: '🔄 Pozícióérzékelő invertálása',
     edInvertSensorHint: 'Aktiváld, ha az érzékelő fordított értékeket ad (100% = zárva).',
+    edPulseSwitch: '⚡ Impulzuskapcsoló',
+    edPulseSwitchHint: 'Aktiváld ha a relé csak röviden (~1-3s) kapcsol, de a motor teljes utat tesz meg.',
+    edUseLock: '🔐 Zár használata',
+    edUseLockHint: 'Aktiváld a zárfunkció engedélyezéséhez. Ha aktív és a zár BE, a Nyitás gomb letiltásra kerül.',
     lightBtn: 'LÁMPA',
   },
   cs: {
@@ -449,7 +498,7 @@ const TRANSLATIONS = {
     entityLabel: 'Entity',
     entityGatePos: '📡 Senzor polohy', entityGateOpen: '🔓 Přepínač Otevření',
     entityGateClose: '🔒 Přepínač Zavření', entityGateStop: '🛑 Přepínač Stop',
-    entityGateLight: '💡 Přepínač Světlo', entityCamera: '📷 Kamera',
+    entityGateLight: '💡 Přepínač Světlo', entityGateLock: '🔐 Přepínač Zámek', entityCamera: '📷 Kamera',
     entityMotion: '🏃 Senzor pohybu', entityPerson: '👤 Senzor osoby',
     entityFlipped: '🔄 Logická hodnota překlápění',
     color1: 'Barva 1 (vlevo nahoře)', color2: 'Barva 2 (vpravo dole)',
@@ -469,6 +518,10 @@ const TRANSLATIONS = {
     edNoSensorHint: 'Zapnout pokud brána nemá snímač polohy. Pozice bude odhadnuta časovačem.',
     edInvertSensor: '🔄 Invertovat snímač polohy',
     edInvertSensorHint: 'Zapnout pokud snímač hlásí obrácené hodnoty (100% = zavřeno).',
+    edPulseSwitch: '⚡ Impulsní spínač',
+    edPulseSwitchHint: 'Zapnout pokud relé sepne jen krátce (~1-3s), ale motor projede celou dráhu.',
+    edUseLock: '🔐 Použít zámek',
+    edUseLockHint: 'Zapnout pro aktivaci zámku. Pokud aktivní a zámek ZAPNUT, tlačítko Otevřít bude deaktivováno.',
     lightBtn: 'SVĚTLO',
   },
   it: {
@@ -497,7 +550,7 @@ const TRANSLATIONS = {
     entityLabel: 'Entità',
     entityGatePos: '📡 Sensore posizione', entityGateOpen: '🔓 Switch Apertura',
     entityGateClose: '🔒 Switch Chiusura', entityGateStop: '🛑 Switch Stop',
-    entityGateLight: '💡 Switch Luce', entityCamera: '📷 Telecamera',
+    entityGateLight: '💡 Switch Luce', entityGateLock: '🔐 Switch Serratura', entityCamera: '📷 Telecamera',
     entityMotion: '🏃 Sensore movimento', entityPerson: '👤 Sensore presenza',
     entityFlipped: '🔄 Input Boolean flip',
     color1: 'Colore 1 (in alto a sinistra)', color2: 'Colore 2 (in basso a destra)',
@@ -517,6 +570,10 @@ const TRANSLATIONS = {
     edNoSensorHint: 'Attiva se il cancello non ha sensore. La posizione sarà stimata tramite timer.',
     edInvertSensor: '🔄 Inverti sensore posizione',
     edInvertSensorHint: 'Attiva se il sensore riporta valori invertiti (100% = chiuso).',
+    edPulseSwitch: '⚡ Interruttore a impulso',
+    edPulseSwitchHint: "Attiva se il relè pulsa brevemente (~1-3s) ma il motore percorre l'intera corsa.",
+    edUseLock: '🔐 Usa il blocco',
+    edUseLockHint: 'Attiva per abilitare il blocco. Se attivo e blocco ON, il pulsante Apri sarà disabilitato.',
     lightBtn: 'LUCE',
   },
 };
@@ -567,6 +624,7 @@ const DEFAULT_CONFIG = {
   entity_gate_close: '',
   entity_gate_stop: '',
   entity_gate_light: '',
+  entity_gate_lock: '',
   entity_camera: '',
   entity_motion: '',
   entity_person: '',
@@ -574,7 +632,9 @@ const DEFAULT_CONFIG = {
   home_name: '',
   no_sensor: false,
   invert_sensor: false,
+  pulse_switch: false,
   travel_time_sec: 20,
+  use_lock: false,
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -614,6 +674,7 @@ class GateCard extends HTMLElement {
     this._timerInterval = null;
     this._lastOpenState  = false;
     this._lastCloseState = false;
+    this._lastStopState  = false;
   }
 
   setConfig(config) {
@@ -644,11 +705,26 @@ class GateCard extends HTMLElement {
     if (this._config.no_sensor) {
       const isOpen  = sv(hass, this._config.entity_gate_open)  === 'on';
       const isClose = sv(hass, this._config.entity_gate_close) === 'on';
-      if (isOpen !== this._lastOpenState || isClose !== this._lastCloseState) {
-        this._lastOpenState  = isOpen;
-        this._lastCloseState = isClose;
-        this._startTimerPos(isOpen ? 1 : isClose ? -1 : 0);
+      const isStop  = sv(hass, this._config.entity_gate_stop)  === 'on';
+
+      if (this._config.pulse_switch) {
+        // Pulse mode: only react on rising edge — relay clicks briefly then turns off
+        // but motor runs full travel. Never stop timer on relay going LOW.
+        const openRising  = isOpen  && !this._lastOpenState;
+        const closeRising = isClose && !this._lastCloseState;
+        const stopRising  = isStop  && !this._lastStopState;
+        if      (openRising)  this._startTimerPos(1);
+        else if (closeRising) this._startTimerPos(-1);
+        else if (stopRising)  this._startTimerPos(0);
+      } else {
+        // Hold mode: timer follows relay state directly
+        if (isOpen !== this._lastOpenState || isClose !== this._lastCloseState) {
+          this._startTimerPos(isOpen ? 1 : isClose ? -1 : 0);
+        }
       }
+      this._lastOpenState  = isOpen;
+      this._lastCloseState = isClose;
+      this._lastStopState  = isStop;
     }
     this._syncCamera();
   }
@@ -836,8 +912,8 @@ class GateCard extends HTMLElement {
       set('f-dot',    el => { el.style.background = frontColor; el.style.boxShadow = `0 0 10px ${frontColor},0 0 20px ${frontColor}55`; });
       set('f-stxt',   el => { el.textContent = frontStatus; el.style.color = frontColor; el.style.textShadow = `0 0 10px ${frontColor}`; });
       set('f-sub',    el => { el.textContent = frontSub; });
-      set('f-pct',    el => { el.textContent = `${pct}%`; });
-      set('f-fill',   el => { el.style.width = `${pct}%`; el.style.background = `linear-gradient(90deg,#00ccaa,${pct>50?'#00ffcc':'#00eeff'})`; });
+      set('f-pct',    el => { el.textContent = `${pct}%`; el.style.color = cfg.no_sensor ? 'rgba(255,70,70,0.9)' : 'rgba(255,255,255,.7)'; });
+      set('f-fill',   el => { el.style.width = `${pct}%`; el.style.background = cfg.no_sensor ? `linear-gradient(90deg,#cc2222,${pct>50?'#ff4444':'#ff6666'})` : `linear-gradient(90deg,#00ccaa,${pct>50?'#00ffcc':'#00eeff'})`; el.style.boxShadow = cfg.no_sensor ? '0 0 6px rgba(255,60,60,.6)' : '0 0 6px rgba(0,255,200,.6)'; });
       set('f-lbtn',   el => { el.style.background = lightOn?'rgba(255,220,50,0.25)':'rgba(0,0,0,0.3)'; el.style.border=`1px solid ${lightOn?'rgba(255,220,50,0.7)':'rgba(255,255,255,0.25)'}`; });
       set('f-ltxt',   el => { el.textContent=t.light(lightOn); el.style.color=lightOn?'#ffd740':'rgba(255,255,255,0.7)'; el.style.textShadow=lightOn?'0 0 8px rgba(255,215,64,0.9)':'none'; });
       set('f-mt',     el => { el.textContent=mTime; el.style.color=mColor; el.style.fontWeight=motionOn?'700':'400'; });
@@ -851,12 +927,13 @@ class GateCard extends HTMLElement {
       const set = (id, fn) => { const el = sr.getElementById(id); if(el) fn(el); };
 
       const lightOn = sv(this._hass, cfg.entity_gate_light) === 'on';
+      const lockOn  = sv(this._hass, cfg.entity_gate_lock)  === 'on';
 
       const svgEl = sr.getElementById('b-svg');
       if (svgEl) {
         const isShutter = (cfg.gate_style || 'slide') === 'shutter';
         svgEl.innerHTML = isShutter
-          ? this._svgShutter(pos, isOpen, isClose, isStop, isClosed, isMoving, lightOn)
+          ? this._svgShutter(pos, isOpen, isClose, isStop, isClosed, isMoving, lightOn, lockOn)
           : this._svgInner(pos, isOpen, isClose, isStop, isClosed, isMoving, lightOn);
       }
 
@@ -884,7 +961,9 @@ class GateCard extends HTMLElement {
           const lbl = el.querySelector('.bl');     if(lbl) lbl.style.color = active ? color : 'rgba(255,255,255,0.85)';
         });
       };
-      applyBtn('b-bo', isOpen,  bOpen,  pos >= 99);
+      const lockBlocked = cfg.use_lock && lockOn;
+
+      applyBtn('b-bo', isOpen,  bOpen,  pos >= 99 || lockBlocked);
       applyBtn('b-bs', isStop,  bStop,  false);
       applyBtn('b-bc', isClose, bClose, pos <= 1);
     }
@@ -939,7 +1018,7 @@ class GateCard extends HTMLElement {
 
   _toggle(entityId) {
     if (!entityId || !this._hass) return;
-    this._hass.callService(entityId.split('.')[0], 'toggle', { entity_id: entityId });
+    this._hass.callService('homeassistant', 'toggle', { entity_id: entityId });
   }
 
   // ── Front HTML ───────────────────────────────────────────────────────────────
@@ -1028,12 +1107,13 @@ class GateCard extends HTMLElement {
     const closeIcon = isShutter ? 'mdi:arrow-down-bold' : 'mdi:arrow-expand-right';
 
     const initLight = this._hass ? sv(this._hass, this._config.entity_gate_light) === 'on' : false;
-    const timerBadge = cfg.no_sensor ? `<span style="font-family:monospace;font-size:8px;color:rgba(255,180,0,0.7);letter-spacing:0.5px;background:rgba(255,180,0,0.1);border:1px solid rgba(255,180,0,0.3);border-radius:4px;padding:1px 5px;">⏱ TIMER</span>` : '';
+    const initLock  = this._hass ? sv(this._hass, this._config.entity_gate_lock)  === 'on' : false;
+    const timerBadge = cfg.no_sensor ? `<span style="font-family:monospace;font-size:8px;color:rgba(255,60,60,0.9);letter-spacing:0.5px;background:rgba(255,40,40,0.12);border:1px solid rgba(255,60,60,0.4);border-radius:4px;padding:1px 5px;">⏱ TIMER</span>` : '';
     return `
 <div class="back">
   <div class="svg-wrap">
     <svg id="b-svg" viewBox="${isShutter ? '0 0 660 390' : '0 0 560 175'}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="display:block;width:100%;height:100%;flex:1;min-height:0;">
-      ${isShutter ? this._svgShutter(0, false, false, false, true, false, initLight) : this._svgInner(0, false, false, false, true, false, initLight)}
+      ${isShutter ? this._svgShutter(0, false, false, false, true, false, initLight, initLock) : this._svgInner(0, false, false, false, true, false, initLight)}
     </svg>
     <div class="status-row">
       <div id="b-dot" style="width:9px;height:9px;border-radius:50%;background:#00ccaa;box-shadow:0 0 8px #00ccaa;flex-shrink:0;"></div>
@@ -1042,7 +1122,7 @@ class GateCard extends HTMLElement {
       <span style="margin-left:auto;display:flex;align-items:center;gap:5px;flex-shrink:0;">
         ${timerBadge}
         <span style="font-family:monospace;font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:0.5px;">${cfg.no_sensor ? '⏱' : t.edSensorPos}</span>
-        <span id="b-pct" style="font-family:monospace;font-size:10px;color:rgba(0,255,200,0.7);letter-spacing:1px;font-weight:700;"></span>
+        <span id="b-pct" style="font-family:monospace;font-size:10px;color:${cfg.no_sensor ? 'rgba(255,70,70,0.9)' : 'rgba(56,189,248,0.85)'};letter-spacing:1px;font-weight:700;"></span>
       </span>
     </div>
   </div>
@@ -1052,25 +1132,25 @@ class GateCard extends HTMLElement {
     <button id="b-bo" class="ctrl-btn" style="margin:4px 3px 4px 0;height:40px;" data-action="open-gate">
       <div style="display:flex;align-items:center;gap:5px;padding:0 8px;">
         <ha-icon icon="${openIcon}" style="color:${bOpen}b3;--mdi-icon-size:16px;flex-shrink:0;"></ha-icon>
-        <span class="bl" style="font-family:monospace;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.open}</span>
+        <span class="bl" style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.open}</span>
       </div>
     </button>
     <button id="b-bs" class="ctrl-btn" style="margin:4px 3px;height:40px;" data-action="stop-gate">
       <div style="display:flex;align-items:center;gap:5px;padding:0 8px;">
         <ha-icon icon="mdi:stop" style="color:${bStop}b3;--mdi-icon-size:16px;flex-shrink:0;"></ha-icon>
-        <span class="bl" style="font-family:monospace;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.stop}</span>
+        <span class="bl" style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.stop}</span>
       </div>
     </button>
     <button id="b-bc" class="ctrl-btn" style="margin:4px 3px;height:40px;" data-action="close-gate">
       <div style="display:flex;align-items:center;gap:5px;padding:0 8px;">
         <ha-icon icon="${closeIcon}" style="color:${bClose}b3;--mdi-icon-size:16px;flex-shrink:0;"></ha-icon>
-        <span class="bl" style="font-family:monospace;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.close}</span>
+        <span class="bl" style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.close}</span>
       </div>
     </button>
     <button id="b-bl" class="ctrl-btn" style="margin:4px 0 4px 3px;height:40px;" data-action="toggle-light">
       <div style="display:flex;align-items:center;gap:5px;padding:0 8px;">
         <ha-icon icon="mdi:lightbulb" id="b-bl-ico" style="color:rgba(255,220,50,0.7);--mdi-icon-size:16px;flex-shrink:0;"></ha-icon>
-        <span class="bl" style="font-family:monospace;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.lightBtn}</span>
+        <span class="bl" style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.lightBtn}</span>
       </div>
     </button>
   </div>
@@ -1154,7 +1234,7 @@ ${lightOn?`<circle cx="459" cy="18" r="18" fill="rgba(255,220,80,0.18)"/><circle
   }
 
   // ── SVG Shutter (cửa cuốn nhà xe) ───────────────────────────────────────────
-  _svgShutter(pos, isOpening, isClosing, isStopped, isClosed, isMoving, lightOn = false) {
+  _svgShutter(pos, isOpening, isClosing, isStopped, isClosed, isMoving, lightOn = false, lockOn = false) {
     const t = this.t;
     const isOpened  = !isMoving && !isStopped && pos >= 99;
     const isPartial = !isMoving && !isStopped && pos > 1 && pos < 99;
@@ -1430,6 +1510,35 @@ ${motorDot}${arrowUp}${arrowDown}
 <polygon points="411,242 429,242 426,258 414,258" fill="#1e2838" stroke="#2e3848" stroke-width="0.7"/>
 <rect x="413" y="243" width="12" height="10" rx="1" fill="${glassFill}"/>
 <ellipse cx="420" cy="248" rx="4" ry="3" fill="${bulbFill}"/>
+<!-- LOCK BUTTON — right wall beside pedestrian door -->
+${this._config.entity_gate_lock ? (() => {
+  // ON = locked (green, shackle down), OFF = unlocked (red, shackle up)
+  const lx = 543, ly = 300;
+  const col    = lockOn ? '#00cc77' : '#ee3333';
+  const glow   = lockOn ? 'rgba(0,200,100,0.22)' : 'rgba(238,50,50,0.22)';
+  const stroke = lockOn ? 'rgba(0,220,120,0.8)'  : 'rgba(238,80,80,0.8)';
+  const shY    = lockOn ? ly - 18 : ly - 24;   // shackle top Y — up when unlocked
+  const shH    = lockOn ? 10      : 14;         // shackle visible height
+  const label  = lockOn ? 'LOCKED' : 'OPEN';
+  return `
+<rect x="${lx-24}" y="${ly-28}" width="48" height="58" rx="9"
+  fill="${glow}" stroke="${stroke}" stroke-width="1.8"
+  data-action="toggle-lock" style="cursor:pointer;"/>
+<path d="M${lx-9},${shY+shH} L${lx-9},${shY} A9,9 0 0,1 ${lx+9},${shY} L${lx+9},${shY+shH}"
+  fill="none" stroke="${col}" stroke-width="4.5" stroke-linecap="round"
+  data-action="toggle-lock" style="cursor:pointer;"/>
+<rect x="${lx-14}" y="${ly-8}" width="28" height="22" rx="5"
+  fill="${col}" data-action="toggle-lock" style="cursor:pointer;"/>
+<circle cx="${lx}" cy="${ly+2}" r="4.5"
+  fill="${lockOn?'#007744':'#880000'}"
+  data-action="toggle-lock" style="cursor:pointer;"/>
+<rect x="${lx-2}" y="${ly+3}" width="4" height="6" rx="1.5"
+  fill="${lockOn?'#007744':'#880000'}"
+  data-action="toggle-lock" style="cursor:pointer;"/>
+<text x="${lx}" y="${ly+40}" text-anchor="middle"
+  font-size="8" fill="${col}" font-family="monospace" font-weight="bold" letter-spacing="0.5"
+  data-action="toggle-lock" style="cursor:pointer;">${label}</text>`;
+})() : ''}
 <!-- POSITION inside SVG (subtle) -->
 <text x="330" y="395" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.22)" font-family="monospace" letter-spacing="1">${t.position(pos)}</text>`;
   }
@@ -1466,10 +1575,18 @@ ${motorDot}${arrowUp}${arrowDown}
 
       const map = {
         'toggle-light': cfg.entity_gate_light,
+        'toggle-lock':  cfg.entity_gate_lock,
         'open-gate':    cfg.entity_gate_open,
         'stop-gate':    cfg.entity_gate_stop,
         'close-gate':   cfg.entity_gate_close,
       };
+
+      // Block open-gate when use_lock is enabled and lock entity is ON
+      if (action === 'open-gate' && cfg.use_lock) {
+        const lockState = this._hass ? (this._hass.states?.[cfg.entity_gate_lock]?.state || '') : '';
+        if (lockState === 'on') return; // locked — do nothing
+      }
+
       this._toggle(map[action]);
     });
   }
@@ -1673,7 +1790,7 @@ class GateCardEditor extends HTMLElement {
 </style>
 <div class="editor">
   <div class="credit">🚧 <strong>Gate Card</strong>
-    <span style="color:var(--secondary-text-color);font-weight:400;">v1.1.3 Designed by @doanlong1412 from 🇻🇳 Vietnam</span>
+    <span style="color:var(--secondary-text-color);font-weight:400;">v1.2 Designed by @doanlong1412 from 🇻🇳 Vietnam</span>
   </div>
 
   <!-- 1. Language -->
@@ -1801,7 +1918,26 @@ class GateCardEditor extends HTMLElement {
               style="flex:1;accent-color:var(--primary-color);">
             <span id="travel-time-val" style="font-family:monospace;font-size:14px;font-weight:700;color:var(--primary-color);min-width:40px;text-align:right;">${cfg.travel_time_sec||20}s</span>
           </div>
-        </div>` : ''}
+        </div>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;padding:8px 2px 2px;">
+          <div style="position:relative;width:40px;height:22px;flex-shrink:0;">
+            <span id="toggle-pulse-switch" style="
+              position:absolute;inset:0;border-radius:11px;cursor:pointer;transition:background .2s;
+              background:${cfg.pulse_switch?'var(--primary-color,#03a9f4)':'rgba(0,0,0,0.12)'};
+              border:1px solid ${cfg.pulse_switch?'var(--primary-color,#03a9f4)':'var(--divider-color)'};
+            ">
+              <span style="
+                position:absolute;top:2px;left:${cfg.pulse_switch?'20':'2'}px;width:16px;height:16px;
+                border-radius:50%;background:#fff;transition:left .2s;
+                box-shadow:0 1px 3px rgba(0,0,0,0.3);
+              "></span>
+            </span>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;color:var(--primary-text-color);">${t.edPulseSwitch}</div>
+            <div style="font-size:11px;color:var(--secondary-text-color);margin-top:2px;line-height:1.4;">${t.edPulseSwitchHint}</div>
+          </div>
+        </label>` : ''}
       </div>
       <div style="padding:4px 0 8px;border-bottom:1px solid var(--divider-color);margin-bottom:6px;">
         <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;padding:4px 0;">
@@ -1824,11 +1960,33 @@ class GateCardEditor extends HTMLElement {
           </div>
         </label>
       </div>
+      <div style="padding:4px 0 8px;border-bottom:1px solid var(--divider-color);margin-bottom:6px;">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;padding:4px 0;">
+          <div style="position:relative;width:40px;height:22px;flex-shrink:0;">
+            <span id="toggle-use-lock" style="
+              position:absolute;inset:0;border-radius:11px;cursor:pointer;transition:background .2s;
+              background:${cfg.use_lock?'#cc2200':'rgba(0,0,0,0.12)'};
+              border:1px solid ${cfg.use_lock?'#ee3311':'var(--divider-color)'};
+            ">
+              <span style="
+                position:absolute;top:2px;left:${cfg.use_lock?'20':'2'}px;width:16px;height:16px;
+                border-radius:50%;background:#fff;transition:left .2s;
+                box-shadow:0 1px 3px rgba(0,0,0,0.3);
+              "></span>
+            </span>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;color:var(--primary-text-color);">${t.edUseLock || '🔐 Dùng khóa cổng'}</div>
+            <div style="font-size:11px;color:var(--secondary-text-color);margin-top:2px;line-height:1.4;">${t.edUseLockHint || 'Khi bật và trạng thái khóa là ON, nút Mở cổng sẽ bị vô hiệu hóa.'}</div>
+          </div>
+        </label>
+      </div>
       ${cfg.no_sensor ? '' : this._entityField('entity_gate_position', t.entityGatePos, 'sensor')}
       ${this._entityField('entity_gate_open',     t.entityGateOpen,  'switch')}
       ${this._entityField('entity_gate_close',    t.entityGateClose, 'switch')}
       ${this._entityField('entity_gate_stop',     t.entityGateStop,  'switch')}
       ${this._entityField('entity_gate_light',    t.entityGateLight, 'switch')}
+      ${this._entityField('entity_gate_lock',     t.entityGateLock,  'switch')}
       ${this._entityField('entity_camera',        t.entityCamera,    'camera')}
       ${this._entityField('entity_motion',        t.entityMotion,    'binary_sensor')}
       ${this._entityField('entity_person',        t.entityPerson,    'binary_sensor')}
@@ -1995,13 +2153,12 @@ class GateCardEditor extends HTMLElement {
     // no-sensor toggle
     const noSensorToggle = sr.getElementById('toggle-no-sensor');
     if (noSensorToggle) {
-      const doToggle = () => {
+      noSensorToggle.addEventListener('click', () => {
         const val = !this._config.no_sensor;
         this._config = { ...this._config, no_sensor: val };
         this._fire();
         this._render();
-      };
-      noSensorToggle.addEventListener('click', doToggle);
+      });
     }
 
     // invert-sensor toggle
@@ -2010,6 +2167,28 @@ class GateCardEditor extends HTMLElement {
       invertSensorToggle.addEventListener('click', () => {
         const val = !this._config.invert_sensor;
         this._config = { ...this._config, invert_sensor: val };
+        this._fire();
+        this._render();
+      });
+    }
+
+    // use-lock toggle
+    const useLockToggle = sr.getElementById('toggle-use-lock');
+    if (useLockToggle) {
+      useLockToggle.addEventListener('click', () => {
+        const val = !this._config.use_lock;
+        this._config = { ...this._config, use_lock: val };
+        this._fire();
+        this._render();
+      });
+    }
+
+    // pulse-switch toggle
+    const pulseSwitchToggle = sr.getElementById('toggle-pulse-switch');
+    if (pulseSwitchToggle) {
+      pulseSwitchToggle.addEventListener('click', () => {
+        const val = !this._config.pulse_switch;
+        this._config = { ...this._config, pulse_switch: val };
         this._fire();
         this._render();
       });
