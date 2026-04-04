@@ -54,7 +54,7 @@ const TRANSLATIONS = {
     light: on => `ĐÈN CỔNG · ${on?'BẬT':'TẮT'}`,
     motion: 'Chuyển động:', person: 'Người:',
     control: 'ĐIỀU KHIỂN ▶', back: '◀ QUAY LẠI',
-    open: 'Mở Cổng', stop: 'Dừng', close: 'Đóng Cổng',
+    open: 'Mở', stop: 'Dừng', close: 'Đóng',
     warn_open: '⚠️ CỔNG ĐANG MỞ — CHÚ Ý AN TOÀN',
     warn_close: '⚠️ CỔNG ĐANG ĐÓNG — CHÚ Ý AN TOÀN',
     posClose: 'ĐÓNG', posOpen: 'MỞ', position: p => `POSITION ${Math.round(p)}%`,
@@ -1052,25 +1052,25 @@ class GateCard extends HTMLElement {
     <button id="b-bo" class="ctrl-btn" style="margin:4px 3px 4px 0;height:40px;" data-action="open-gate">
       <div style="display:flex;align-items:center;gap:5px;padding:0 8px;">
         <ha-icon icon="${openIcon}" style="color:${bOpen}b3;--mdi-icon-size:16px;flex-shrink:0;"></ha-icon>
-        <span class="bl" style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.open}</span>
+        <span class="bl" style="font-family:monospace;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.open}</span>
       </div>
     </button>
     <button id="b-bs" class="ctrl-btn" style="margin:4px 3px;height:40px;" data-action="stop-gate">
       <div style="display:flex;align-items:center;gap:5px;padding:0 8px;">
         <ha-icon icon="mdi:stop" style="color:${bStop}b3;--mdi-icon-size:16px;flex-shrink:0;"></ha-icon>
-        <span class="bl" style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.stop}</span>
+        <span class="bl" style="font-family:monospace;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.stop}</span>
       </div>
     </button>
     <button id="b-bc" class="ctrl-btn" style="margin:4px 3px;height:40px;" data-action="close-gate">
       <div style="display:flex;align-items:center;gap:5px;padding:0 8px;">
         <ha-icon icon="${closeIcon}" style="color:${bClose}b3;--mdi-icon-size:16px;flex-shrink:0;"></ha-icon>
-        <span class="bl" style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.close}</span>
+        <span class="bl" style="font-family:monospace;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.close}</span>
       </div>
     </button>
     <button id="b-bl" class="ctrl-btn" style="margin:4px 0 4px 3px;height:40px;" data-action="toggle-light">
       <div style="display:flex;align-items:center;gap:5px;padding:0 8px;">
         <ha-icon icon="mdi:lightbulb" id="b-bl-ico" style="color:rgba(255,220,50,0.7);--mdi-icon-size:16px;flex-shrink:0;"></ha-icon>
-        <span class="bl" style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.lightBtn}</span>
+        <span class="bl" style="font-family:monospace;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.lightBtn}</span>
       </div>
     </button>
   </div>
@@ -1673,7 +1673,7 @@ class GateCardEditor extends HTMLElement {
 </style>
 <div class="editor">
   <div class="credit">🚧 <strong>Gate Card</strong>
-    <span style="color:var(--secondary-text-color);font-weight:400;">v1.1 Designed by @doanlong1412 from 🇻🇳 Vietnam</span>
+    <span style="color:var(--secondary-text-color);font-weight:400;">v1.1.3 Designed by @doanlong1412 from 🇻🇳 Vietnam</span>
   </div>
 
   <!-- 1. Language -->
@@ -1994,8 +1994,7 @@ class GateCardEditor extends HTMLElement {
 
     // no-sensor toggle
     const noSensorToggle = sr.getElementById('toggle-no-sensor');
-    const noSensorChk    = sr.getElementById('chk-no-sensor');
-    if (noSensorToggle && noSensorChk) {
+    if (noSensorToggle) {
       const doToggle = () => {
         const val = !this._config.no_sensor;
         this._config = { ...this._config, no_sensor: val };
