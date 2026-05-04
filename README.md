@@ -1,13 +1,13 @@
 # 🚧 Gate Card
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-![version](https://img.shields.io/badge/version-1.1.2-blue)
+![version](https://img.shields.io/badge/version-1.3.0-blue)
 ![HA](https://img.shields.io/badge/Home%20Assistant-2023.1+-green)
 ![license](https://img.shields.io/badge/license-MIT-lightgrey)
 
 > 🇻🇳 **Phiên bản tiếng Việt:** [README_vi.md](README_vi.md)
 
-A custom Home Assistant Lovelace card for smart gate and garage door control — live camera feed, two animated diagram styles (sliding gate & rolling shutter garage), motion/person sensors, gate light toggle, no-sensor timer mode, and a full visual editor.
+A custom Home Assistant Lovelace card for smart gate and garage door control — live camera feed, three animated diagram styles (sliding gate, rolling shutter garage & 2-wing swing gate), motion/person sensors, gate light toggle, lock support, no-sensor timer mode, and a full visual editor.
 
 **No extra plugins required. Works standalone, fully configurable through the built-in UI editor.**
 
@@ -25,7 +25,7 @@ A custom Home Assistant Lovelace card for smart gate and garage door control —
 
 ---
 
-## ✨ Features (v1.1.2)
+## ✨ Features (v1.3.0)
 
 ### 🎨 Display & Interface
 - 🚧 **Front face** — gate title, zone label, live status with colour-coded indicator, open/close progress bar, gate light toggle button
@@ -33,9 +33,23 @@ A custom Home Assistant Lovelace card for smart gate and garage door control —
 - 👁️ **Motion & person sensor bar** — shows last detected time for both sensors with colour highlight when active
 - 🔄 **Flip animation** — smooth fade/scale transition between front (status) and back (control) face
 
-### 🏠 Two Diagram Styles (back face)
+### 🏠 Three Diagram Styles (back face)
 - **🚧 Sliding Gate** — animated SVG gate slides horizontally, lock icon when closed, PIR sensor pulse, directional motor arrows
 - **🏠 Rolling Shutter / Garage** — animated rolling shutter house scene: slats roll up/down with real gate position, Vietnamese flag, car with customisable license plate, wall lamps glow when gate light is on
+- **🚪 2-Wing Swing Gate** — both wings open inward symmetrically based on position (0–100%), granite stone pillars with round bulb lamps, center lock fades out as gate opens, PIR motion indicator, directional arc arrows
+
+### 🔐 Gate Lock Support
+- Enable **"Use gate lock"** and assign a lock entity
+- When the lock is ON, the Open button is automatically **disabled** to prevent accidental operation
+- Lock state is visible in the SVG diagram (center lock icon)
+
+### ⚡ Pulse Switch Mode
+- Enable **"Pulse switch"** if your relay only pulses briefly (~1–3 s) but the motor runs the full travel distance
+- The position timer completes the full travel animation regardless of relay state
+
+### 🔄 Sensor Invert Mode
+- Enable **"Invert position sensor"** if your sensor reports reversed values (100% = closed)
+- The card automatically inverts the position value before displaying
 
 ### 🚗 No Position Sensor Mode
 - Toggle **"No position sensor"** in the editor to enable timer-based position estimation
@@ -44,7 +58,7 @@ A custom Home Assistant Lovelace card for smart gate and garage door control —
 ### 🎛️ Control Panel (back face)
 - **3 control buttons** — Open / Stop / Close with colour-coded active states, auto-disabled when already at limit
 - **⚠️ Safety warning ticker** — scrolling alert banner while gate is opening or closing
-- Button icons auto-switch: `↑↓` for shutter style, `←→` for sliding gate style
+- Button icons auto-switch per style: `↑↓` for shutter, `←→` for sliding gate, `🚪` for swing gate
 
 ### 🌐 Multi-language Support (10 languages)
 - 🇻🇳 Tiếng Việt / 🇬🇧 English / 🇩🇪 Deutsch / 🇫🇷 Français / 🇳🇱 Nederlands
@@ -103,9 +117,9 @@ After adding the card, click **✏️ Edit** to open the Config Editor.
 | # | Section | Contents |
 |---|---------|----------|
 | 1 | 🌐 **Language** | 10 languages with real flag images |
-| 2 | 🏠 **Gate Style** | Sliding gate or rolling shutter garage |
+| 2 | 🏠 **Gate Style** | Sliding gate / Rolling shutter / 2-Wing swing gate |
 | 3 | 🚧 **Gate Name** | Title, zone, license plate (line 1 & 2), home name |
-| 4 | ⚡ **Entities** | All entity pickers + no-sensor mode + travel time |
+| 4 | ⚡ **Entities** | All entity pickers + no-sensor mode + travel time + lock + pulse switch |
 | 5 | 🎨 **Colors** | Accent, text, and 3 button colours |
 | 6 | 🎨 **Background** | 16 gradient presets + custom two-colour picker |
 
@@ -161,7 +175,8 @@ The flip state is now stored in Home Assistant. It persists across page reloads 
 | Config key | Entity type | Description |
 |---|---|---|
 | `entity_gate_position` | `sensor` | Gate position (0–100%). Not needed if `no_sensor: true` |
-| `entity_gate_light` | `switch` | Gate light — lamps glow in garage diagram |
+| `entity_gate_light` | `switch` | Gate light — lamps glow in diagram |
+| `entity_gate_lock` | `switch` | Gate lock — disables Open button when ON (requires `use_lock: true`) |
 | `entity_camera` | `camera` | Live camera snapshot (refreshed every 5 s) |
 | `entity_motion` | `binary_sensor` | Motion sensor |
 | `entity_person` | `binary_sensor` | Person / occupancy sensor |
@@ -174,7 +189,7 @@ The flip state is now stored in Home Assistant. It persists across page reloads 
 | Config key | Type | Default | Description |
 |---|---|---|---|
 | `language` | string | `vi` | `vi`/`en`/`de`/`fr`/`nl`/`pl`/`sv`/`hu`/`cs`/`it` |
-| `gate_style` | string | `slide` | `slide` = sliding gate · `shutter` = rolling shutter garage |
+| `gate_style` | string | `slide` | `slide` = sliding gate · `shutter` = rolling shutter garage · `cover` = 2-wing swing gate |
 | `gate_title` | string | *(lang default)* | Display name shown on the card |
 | `gate_zone` | string | *(lang default)* | Zone / subtitle text |
 | `home_name` | string | `MY HOME` | Label on motor box in garage diagram |
@@ -182,6 +197,9 @@ The flip state is now stored in Home Assistant. It persists across page reloads 
 | `license_plate_line2` | string | `873.76` | Car plate line 2 |
 | `no_sensor` | boolean | `false` | Timer-based position when no sensor exists |
 | `travel_time_sec` | number | `20` | Travel time in seconds (requires `no_sensor: true`) |
+| `invert_sensor` | boolean | `false` | Invert sensor value — use if 100% means closed |
+| `pulse_switch` | boolean | `false` | Pulse relay mode — timer runs full travel even after relay turns off |
+| `use_lock` | boolean | `false` | Enable gate lock — disables Open button when lock entity is ON |
 | `background_preset` | string | `default` | Gradient preset name |
 | `bg_color1` | hex | `#001e2b` | Custom gradient colour 1 (top-left) |
 | `bg_color2` | hex | `#12c6f3` | Custom gradient colour 2 (bottom-right) |
@@ -190,11 +208,47 @@ The flip state is now stored in Home Assistant. It persists across page reloads 
 | `btn_stop_color` | hex | `#ff5252` | Stop button colour |
 | `btn_close_color` | hex | `#00dcff` | Close button colour |
 | `text_color` | hex | `#ffffff` | Primary text colour |
+| `entity_gate_lock` | entity | — | Lock switch entity (requires `use_lock: true`) |
 | `entity_flipped` | entity | — | `input_boolean` for flip state |
 
 ---
 
 ## 📝 Full YAML example
+
+### Sliding gate
+
+```yaml
+type: custom:gate-card
+language: en
+gate_style: slide
+gate_title: Side Gate
+gate_zone: ZONE-B · GATE CONTROL
+no_sensor: false
+travel_time_sec: 20
+invert_sensor: false
+pulse_switch: false
+use_lock: false
+
+background_preset: default
+accent_color: "#00ffcc"
+btn_open_color: "#00ff96"
+btn_stop_color: "#ff5252"
+btn_close_color: "#00dcff"
+text_color: "#ffffff"
+
+entity_gate_position: sensor.side_gate_position
+entity_gate_open: switch.side_gate_open
+entity_gate_close: switch.side_gate_close
+entity_gate_stop: switch.side_gate_stop
+entity_gate_light: switch.side_gate_light
+entity_gate_lock: switch.side_gate_lock
+entity_camera: camera.side_gate_camera
+entity_motion: binary_sensor.side_gate_motion
+entity_person: binary_sensor.side_gate_person
+entity_flipped: input_boolean.side_gate_flipped
+```
+
+### Rolling shutter garage
 
 ```yaml
 type: custom:gate-card
@@ -208,13 +262,7 @@ license_plate_line2: 873.76
 no_sensor: false
 travel_time_sec: 20
 
-background_preset: default
-accent_color: "#00ffcc"
-btn_open_color: "#00ff96"
-btn_stop_color: "#ff5252"
-btn_close_color: "#00dcff"
-text_color: "#ffffff"
-
+background_preset: night
 entity_gate_position: sensor.garage_door_position
 entity_gate_open: switch.garage_door_open
 entity_gate_close: switch.garage_door_close
@@ -223,21 +271,49 @@ entity_gate_light: switch.garage_light
 entity_camera: camera.garage_camera
 entity_motion: binary_sensor.garage_motion
 entity_person: binary_sensor.garage_person
-entity_flipped: input_boolean.gate_card_flipped
+entity_flipped: input_boolean.garage_card_flipped
 ```
 
-### Without position sensor
+### 2-Wing swing gate
 
 ```yaml
 type: custom:gate-card
 language: en
-gate_style: shutter
+gate_style: cover
+gate_title: Main Gate
+gate_zone: ZONE-A · MAIN ENTRANCE
+no_sensor: false
+travel_time_sec: 25
+use_lock: true
+
+background_preset: default
+entity_gate_position: sensor.main_gate_position
+entity_gate_open: switch.main_gate_open
+entity_gate_close: switch.main_gate_close
+entity_gate_stop: switch.main_gate_stop
+entity_gate_light: switch.main_gate_light
+entity_gate_lock: switch.main_gate_lock
+entity_camera: camera.main_gate_camera
+entity_motion: binary_sensor.main_gate_motion
+entity_person: binary_sensor.main_gate_person
+entity_flipped: input_boolean.main_gate_flipped
+```
+
+### Without position sensor (pulse relay)
+
+```yaml
+type: custom:gate-card
+language: en
+gate_style: cover
 no_sensor: true
-travel_time_sec: 18
-entity_gate_open: switch.garage_door_open
-entity_gate_close: switch.garage_door_close
-entity_gate_stop: switch.garage_door_stop
-entity_flipped: input_boolean.gate_card_flipped
+travel_time_sec: 25
+pulse_switch: true
+use_lock: true
+entity_gate_open: switch.main_gate_open
+entity_gate_close: switch.main_gate_close
+entity_gate_stop: switch.main_gate_stop
+entity_gate_lock: switch.main_gate_lock
+entity_flipped: input_boolean.main_gate_flipped
 ```
 
 ---
@@ -255,6 +331,13 @@ entity_flipped: input_boolean.gate_card_flipped
 ---
 
 ## 📋 Changelog
+
+### v1.3.0
+- 🚪 New `gate_style: cover` — 2-wing swing gate diagram: both wings open inward symmetrically, granite stone pillars, round bulb lamp posts, center lock icon, PIR indicator, arc direction arrows
+- 🔐 Gate lock support (`use_lock` + `entity_gate_lock`) — Open button disabled when locked
+- ⚡ Pulse switch mode (`pulse_switch`) — timer completes full travel even after relay turns off
+- 🔄 Sensor invert mode (`invert_sensor`) — automatically flips sensor value
+- 🎛️ Editor updated with new toggles and hints for all new options
 
 ### v1.1.2
 - 🐛 Bug fixes and stability improvements
