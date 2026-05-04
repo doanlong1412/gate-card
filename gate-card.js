@@ -1,55 +1,25 @@
 /**
  * Gate Card — Custom Home Assistant Lovelace Card
- * v1.2.0 Designed by @doanlong1412 from 🇻🇳 Vietnam
+ * v1.3.0 Designed by @doanlong1412 from 🇻🇳 Vietnam
  * HACS-compatible Web Component
  *
- * ─── What's new in v1.2.0 ────────────────────────────────────────────────────
- *  🔴 Timer mode — màu đỏ dễ nhìn hơn
- *      Badge ⏱ TIMER đổi từ vàng → đỏ tươi.
- *      Chữ % và thanh progress fill cũng đổi sang đỏ khi đang chạy timer,
- *      giúp phân biệt rõ ràng với chế độ cảm biến thật.
+ * ─── What's new in v1.3.0 ────────────────────────────────────────────────────
+ *  🚪 gate_style: 'cover'  — 2-wing swing gate (cổng 2 cánh mở vào trong)
+ *      Transparent background (fence wall + pillars with lamps stay intact).
+ *      Both wings open inward symmetrically based on position (0–100%).
+ *      Center lock icon fades out as gate opens.
+ *      Pillar design, lamp posts and gate panel visuals ported from the
+ *      cover_gate_v4_fixed reference, adapted to SVG for HA Lovelace.
  *
- *  🔵 Sensor mode — màu xanh da trời
- *      Chữ % khi dùng cảm biến vị trí thật đổi sang xanh da trời (#38bdf8)
- *      thay vì cyan nhạt, tương phản tốt hơn trên mọi nền.
- *
- *  🔐 use_lock — Công tắc khóa cổng thông minh
- *      Thêm toggle "Dùng khóa cổng" trong Visual Editor.
- *      Khi bật: nếu entity_gate_lock đang ON thì nút Mở cổng
- *      bị vô hiệu hóa hoàn toàn (UI mờ + chặn event handler),
- *      ngăn mở cổng khi khóa chưa được mở.
- *      Hỗ trợ đầy đủ tất cả 10 ngôn ngữ.
- *
- * ─── Previous: v1.1.0 ────────────────────────────────────────────────────────
+ * ─── What's new in v1.1.0 ────────────────────────────────────────────────────
  *  🏠 gate_style: 'shutter'  — Rolling shutter / garage door diagram
- *      Animated slats (roll up/down with real position), house facade,
- *      Vietnamese flag, car inside garage, glowing wall lamps when light is on,
- *      sky cropped to minimise wasted space.
- *
  *  🚗 license_plate_line1 / license_plate_line2
- *      Customisable car plate rendered on the vehicle in the garage diagram.
- *
  *  🏠 home_name
- *      Custom label shown on the motor box ("MY HOME" by default).
- *
  *  ⏱  no_sensor + travel_time_sec
- *      Timer-based position engine for gates without a position sensor.
- *      Card interpolates 0→100% over travel_time_sec when relay fires.
- *
- *  🌐 6 new languages  (total 10)
- *      🇫🇷 Français · 🇳🇱 Nederlands · 🇵🇱 Polski
- *      🇸🇪 Svenska  · 🇭🇺 Magyar    · 🇨🇿 Čeština
- *      Real country flag images via flagcdn.com.
- *      All editor labels also translate when switching language.
- *
- *  🎨 16 background gradient presets  (8 new: Cherry, Volcano, Galaxy,
- *      Ice, Olive, Slate, Rose, Teal) — 5-column compact grid in editor.
- *
+ *  🌐 6 new languages (total 10)
+ *  🎨 16 background gradient presets
  *  🎛  Editor reordered: Language → Style → Name → Entities → Colors → BG
- *      Size slider removed; card height is now fixed (min 290 / max 400 px).
- *
- *  🐛 Camera fix   — object-fit: contain keeps true 16:9, no zoom/crop.
- *  🐛 Focus fix    — title/zone inputs no longer lose focus on every keystroke.
+ *  🐛 Camera fix / Focus fix
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
@@ -71,7 +41,7 @@ const TRANSLATIONS = {
     light: on => `ĐÈN CỔNG · ${on?'BẬT':'TẮT'}`,
     motion: 'Chuyển động:', person: 'Người:',
     control: 'ĐIỀU KHIỂN ▶', back: '◀ QUAY LẠI',
-    open: 'Mở Cổng', stop: 'Dừng', close: 'Đóng Cổng',
+    open: 'Mở', stop: 'Dừng', close: 'Đóng',
     warn_open: '⚠️ CỔNG ĐANG MỞ — CHÚ Ý AN TOÀN',
     warn_close: '⚠️ CỔNG ĐANG ĐÓNG — CHÚ Ý AN TOÀN',
     posClose: 'ĐÓNG', posOpen: 'MỞ', position: p => `POSITION ${Math.round(p)}%`,
@@ -91,6 +61,7 @@ const TRANSLATIONS = {
     edName: 'Tên cổng',
     edStyleSlide: '🚧 CỔNG TRƯỢT',
     edStyleShutter: '🏠 CỬA CUỐN',
+    edStyleCover: '🚪 CỔNG 2 CÁNH',
     edGateTitle: '🚧 Tên cổng (hiển thị trên card)',
     edGateZone: '📍 Zone / mô tả phụ',
     edPlate1: '🚗 Biển số xe (dòng 1)',
@@ -143,6 +114,7 @@ const TRANSLATIONS = {
     edName: 'Gate Name',
     edStyleSlide: '🚧 SLIDING GATE',
     edStyleShutter: '🏠 SHUTTER DOOR',
+    edStyleCover: '🚪 SWING GATE',
     edGateTitle: '🚧 Gate name (shown on card)',
     edGateZone: '📍 Zone / subtitle',
     edPlate1: '🚗 License plate (line 1)',
@@ -195,6 +167,7 @@ const TRANSLATIONS = {
     edName: 'Torname',
     edStyleSlide: '🚧 SCHIEBETOR',
     edStyleShutter: '🏠 ROLLTOR',
+    edStyleCover: '🚪 FLÜGELTOR',
     edGateTitle: '🚧 Torname (auf Karte)',
     edGateZone: '📍 Zone / Untertitel',
     edPlate1: '🚗 Kennzeichen (Zeile 1)',
@@ -247,6 +220,7 @@ const TRANSLATIONS = {
     edName: 'Nom du portail',
     edStyleSlide: '🚧 PORTAIL COULISSANT',
     edStyleShutter: '🏠 PORTE ROULANTE',
+    edStyleCover: '🚪 PORTAIL BATTANT',
     edGateTitle: '🚧 Nom (affiché sur la carte)',
     edGateZone: '📍 Zone / sous-titre',
     edPlate1: '🚗 Plaque (ligne 1)',
@@ -299,6 +273,7 @@ const TRANSLATIONS = {
     edName: 'Poortnaam',
     edStyleSlide: '🚧 SCHUIFPOORT',
     edStyleShutter: '🏠 ROLLUIK',
+    edStyleCover: '🚪 DRAAIHEK',
     edGateTitle: '🚧 Poortnaam (op kaart)',
     edGateZone: '📍 Zone / ondertitel',
     edPlate1: '🚗 Kenteken (regel 1)',
@@ -351,6 +326,7 @@ const TRANSLATIONS = {
     edName: 'Nazwa bramy',
     edStyleSlide: '🚧 BRAMA PRZESUWNA',
     edStyleShutter: '🏠 BRAMA ROLOWANA',
+    edStyleCover: '🚪 BRAMA DWUSKRZYDŁOWA',
     edGateTitle: '🚧 Nazwa (widoczna na karcie)',
     edGateZone: '📍 Strefa / podtytuł',
     edPlate1: '🚗 Tablica rejestracyjna (linia 1)',
@@ -403,6 +379,7 @@ const TRANSLATIONS = {
     edName: 'Grindnamn',
     edStyleSlide: '🚧 SKJUTGRIND',
     edStyleShutter: '🏠 RULLPORT',
+    edStyleCover: '🚪 GRINDFLYGEL',
     edGateTitle: '🚧 Grindnamn (visas på kort)',
     edGateZone: '📍 Zon / underrubrik',
     edPlate1: '🚗 Registreringsskylt (rad 1)',
@@ -455,6 +432,7 @@ const TRANSLATIONS = {
     edName: 'Kapu neve',
     edStyleSlide: '🚧 TOLÓKAPU',
     edStyleShutter: '🏠 REDŐNYKAPU',
+    edStyleCover: '🚪 KÉTSZÁRNYÚ KAPU',
     edGateTitle: '🚧 Kapu neve (kártyán látható)',
     edGateZone: '📍 Zóna / alcím',
     edPlate1: '🚗 Rendszám (1. sor)',
@@ -507,6 +485,7 @@ const TRANSLATIONS = {
     edName: 'Název brány',
     edStyleSlide: '🚧 POSUVNÁ BRÁNA',
     edStyleShutter: '🏠 ROLOVACÍ BRÁNA',
+    edStyleCover: '🚪 DVOUKŘÍDLÁ BRÁNA',
     edGateTitle: '🚧 Název (zobrazený na kartě)',
     edGateZone: '📍 Zóna / podnadpis',
     edPlate1: '🚗 Registrační značka (řádek 1)',
@@ -559,6 +538,7 @@ const TRANSLATIONS = {
     edName: 'Nome cancello',
     edStyleSlide: '🚧 CANCELLO SCORREVOLE',
     edStyleShutter: '🏠 PORTA AVVOLGIBILE',
+    edStyleCover: '🚪 CANCELLO BATTENTE',
     edGateTitle: '🚧 Nome (mostrato sulla card)',
     edGateZone: '📍 Zona / sottotitolo',
     edPlate1: '🚗 Targa (riga 1)',
@@ -610,7 +590,7 @@ const DEFAULT_CONFIG = {
   language: 'vi',
   gate_title: '',
   gate_zone: '',
-  gate_style: 'slide',   // 'slide' = cổng trượt ngang | 'shutter' = cửa cuốn nhà xe
+  gate_style: 'slide',   // 'slide' = cổng trượt ngang | 'shutter' = cửa cuốn nhà xe | 'cover' = cổng 2 cánh
   background_preset: 'default',
   bg_color1: '#001e2b',
   bg_color2: '#12c6f3',
@@ -635,6 +615,7 @@ const DEFAULT_CONFIG = {
   pulse_switch: false,
   travel_time_sec: 20,
   use_lock: false,
+  backdrop_blur: 12,
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -818,13 +799,15 @@ class GateCard extends HTMLElement {
 :host{display:block;}*{box-sizing:border-box;}
 .card{
   background:${bg};
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(${cfg.backdrop_blur ?? 12}px);-webkit-backdrop-filter:blur(${cfg.backdrop_blur ?? 12}px);
   border-radius:22px;border:1px solid rgba(0,255,255,0.3);
   box-shadow:0 12px 40px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.15);
   overflow:hidden;position:relative;
-  min-height:290px;max-height:400px;
+  min-height:290px;max-height:${cfg.gate_style === 'shutter' ? 370 : 340}px;
   display:flex;flex-direction:column;
 }
+.card[data-cover-back]{background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border-color:rgba(0,255,255,0.18);}
+.card[data-cover-back]::before{display:none;}
 .card::before{content:"";position:absolute;inset:0;
   background:linear-gradient(135deg,rgba(0,0,0,.45) 0%,rgba(0,0,0,.05) 100%);
   z-index:1;pointer-events:none;}
@@ -861,6 +844,9 @@ class GateCard extends HTMLElement {
 .light-btn{margin:0 12px 10px 18px;display:inline-flex;align-items:center;gap:7px;
   padding:5px 12px;border-radius:8px;cursor:pointer;backdrop-filter:blur(4px);flex-shrink:0;}
 .svg-wrap{padding:0;flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;}
+.svg-wrap.transparent-bg{background:transparent!important;}
+.back.cover-mode{background:transparent!important;}
+.back.cover-mode~*,.cover-mode *{}
 .status-row{display:flex;align-items:center;gap:8px;padding:5px 8px 2px;flex-shrink:0;}
 .warn-scroll{overflow:hidden;white-space:nowrap;flex-shrink:0;padding:2px 8px 3px;
   font-size:10px;letter-spacing:1.5px;color:#c8861a;}
@@ -883,6 +869,12 @@ class GateCard extends HTMLElement {
 
     this._bindEvents();
     this._built = true;
+    // Apply transparent bg for cover back face on initial build
+    const card = this.shadowRoot.querySelector('.card');
+    if (card) {
+      const isCoverBack = this._flipped && (this._config.gate_style === 'cover' || this._config.gate_style === 'shutter');
+      card.toggleAttribute('data-cover-back', isCoverBack);
+    }
     this._patch();
     // Defer camera setup so element is in DOM
     requestAnimationFrame(() => this._syncCamera());
@@ -932,8 +924,11 @@ class GateCard extends HTMLElement {
       const svgEl = sr.getElementById('b-svg');
       if (svgEl) {
         const isShutter = (cfg.gate_style || 'slide') === 'shutter';
+        const isCover   = (cfg.gate_style || 'slide') === 'cover';
         svgEl.innerHTML = isShutter
           ? this._svgShutter(pos, isOpen, isClose, isStop, isClosed, isMoving, lightOn, lockOn)
+          : isCover
+          ? this._svgCover(pos, isOpen, isClose, isStop, isClosed, isMoving, lightOn, lockOn)
           : this._svgInner(pos, isOpen, isClose, isStop, isClosed, isMoving, lightOn);
       }
 
@@ -1103,17 +1098,21 @@ class GateCard extends HTMLElement {
     const bStop = cfg.btn_stop_color  || '#ff5252';
     const bClose= cfg.btn_close_color || '#00dcff';
     const isShutter = (cfg.gate_style || 'slide') === 'shutter';
-    const openIcon  = isShutter ? 'mdi:arrow-up-bold'   : 'mdi:arrow-expand-left';
-    const closeIcon = isShutter ? 'mdi:arrow-down-bold' : 'mdi:arrow-expand-right';
+    const isCover   = (cfg.gate_style || 'slide') === 'cover';
+    const openIcon  = isShutter ? 'mdi:arrow-up-bold'   : isCover ? 'mdi:gate-open' : 'mdi:arrow-expand-left';
+    const closeIcon = isShutter ? 'mdi:arrow-down-bold' : isCover ? 'mdi:gate'      : 'mdi:arrow-expand-right';
 
     const initLight = this._hass ? sv(this._hass, this._config.entity_gate_light) === 'on' : false;
     const initLock  = this._hass ? sv(this._hass, this._config.entity_gate_lock)  === 'on' : false;
     const timerBadge = cfg.no_sensor ? `<span style="font-family:monospace;font-size:8px;color:rgba(255,60,60,0.9);letter-spacing:0.5px;background:rgba(255,40,40,0.12);border:1px solid rgba(255,60,60,0.4);border-radius:4px;padding:1px 5px;">⏱ TIMER</span>` : '';
+    const svgViewBox = isShutter ? '0 0 660 390' : isCover ? '0 0 560 310' : '0 0 560 175';
     return `
 <div class="back">
   <div class="svg-wrap">
-    <svg id="b-svg" viewBox="${isShutter ? '0 0 660 390' : '0 0 560 175'}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="display:block;width:100%;height:100%;flex:1;min-height:0;">
-      ${isShutter ? this._svgShutter(0, false, false, false, true, false, initLight, initLock) : this._svgInner(0, false, false, false, true, false, initLight)}
+    <svg id="b-svg" viewBox="${svgViewBox}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="display:block;width:100%;height:100%;flex:1;min-height:0;">
+      ${isShutter ? this._svgShutter(0, false, false, false, true, false, initLight, initLock)
+       : isCover  ? this._svgCover(0, false, false, false, true, false, initLight, initLock)
+                  : this._svgInner(0, false, false, false, true, false, initLight)}
     </svg>
     <div class="status-row">
       <div id="b-dot" style="width:9px;height:9px;border-radius:50%;background:#00ccaa;box-shadow:0 0 8px #00ccaa;flex-shrink:0;"></div>
@@ -1132,25 +1131,25 @@ class GateCard extends HTMLElement {
     <button id="b-bo" class="ctrl-btn" style="margin:4px 3px 4px 0;height:40px;" data-action="open-gate">
       <div style="display:flex;align-items:center;gap:5px;padding:0 8px;">
         <ha-icon icon="${openIcon}" style="color:${bOpen}b3;--mdi-icon-size:16px;flex-shrink:0;"></ha-icon>
-        <span class="bl" style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.open}</span>
+        <span class="bl" style="font-family:monospace;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.open}</span>
       </div>
     </button>
     <button id="b-bs" class="ctrl-btn" style="margin:4px 3px;height:40px;" data-action="stop-gate">
       <div style="display:flex;align-items:center;gap:5px;padding:0 8px;">
         <ha-icon icon="mdi:stop" style="color:${bStop}b3;--mdi-icon-size:16px;flex-shrink:0;"></ha-icon>
-        <span class="bl" style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.stop}</span>
+        <span class="bl" style="font-family:monospace;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.stop}</span>
       </div>
     </button>
     <button id="b-bc" class="ctrl-btn" style="margin:4px 3px;height:40px;" data-action="close-gate">
       <div style="display:flex;align-items:center;gap:5px;padding:0 8px;">
         <ha-icon icon="${closeIcon}" style="color:${bClose}b3;--mdi-icon-size:16px;flex-shrink:0;"></ha-icon>
-        <span class="bl" style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.close}</span>
+        <span class="bl" style="font-family:monospace;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.close}</span>
       </div>
     </button>
     <button id="b-bl" class="ctrl-btn" style="margin:4px 0 4px 3px;height:40px;" data-action="toggle-light">
       <div style="display:flex;align-items:center;gap:5px;padding:0 8px;">
         <ha-icon icon="mdi:lightbulb" id="b-bl-ico" style="color:rgba(255,220,50,0.7);--mdi-icon-size:16px;flex-shrink:0;"></ha-icon>
-        <span class="bl" style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.lightBtn}</span>
+        <span class="bl" style="font-family:monospace;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.85);">${t.lightBtn}</span>
       </div>
     </button>
   </div>
@@ -1326,21 +1325,12 @@ ${lightOn?`<circle cx="459" cy="18" r="18" fill="rgba(255,220,80,0.18)"/><circle
   </linearGradient>
 </defs>
 <style>@keyframes shutterBlink{0%,100%{opacity:1}50%{opacity:0.3}}</style>
-<!-- SKY -->
-<rect x="0" y="0" width="660" height="290" fill="#8ab8d8"/>
-<rect x="0" y="0" width="660" height="140" fill="#aacce8" opacity="0.45"/>
-<g opacity="0.82"><ellipse cx="520" cy="40" rx="55" ry="17" fill="white"/><ellipse cx="550" cy="29" rx="36" ry="15" fill="white"/><ellipse cx="488" cy="32" rx="30" ry="13" fill="white"/></g>
-<g opacity="0.72"><ellipse cx="140" cy="30" rx="48" ry="15" fill="white"/><ellipse cx="166" cy="20" rx="30" ry="13" fill="white"/></g>
 <!-- FLAG -->
 <rect x="26" y="282" width="12" height="16" rx="2" fill="#8a9098"/>
 <rect x="29" y="96" width="4" height="188" fill="#c8d0d8"/>
 <circle cx="31" cy="94" r="4" fill="#d8c060"/>
 <rect x="33" y="96" width="42" height="25" rx="1.5" fill="#da251d"/>
 <polygon points="54,101 56,106.5 62,106.5 57.5,109.5 59.2,115 54,112 48.8,115 50.5,109.5 46,106.5 52,106.5" fill="#ffff00"/>
-<!-- GROUND -->
-<rect x="0" y="370" width="660" height="40" fill="#5a6270"/>
-<line x1="0" y1="370" x2="660" y2="370" stroke="#4a5260" stroke-width="1.5"/>
-<line x1="0" y1="388" x2="660" y2="388" stroke="#505868" stroke-width="0.5" stroke-dasharray="28,14"/>
 <!-- WALLS -->
 <rect x="85" y="248" width="490" height="124" fill="#cfc4ae"/>
 <rect x="85" y="162" width="490" height="90" fill="#d4c9b4"/>
@@ -1543,6 +1533,349 @@ ${this._config.entity_gate_lock ? (() => {
 <text x="330" y="395" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.22)" font-family="monospace" letter-spacing="1">${t.position(pos)}</text>`;
   }
 
+  // ── SVG Cover — cổng 2 cánh mở vào trong ─────────────────────────────────
+  // viewBox: 0 0 560 220
+  // Background is transparent (fence/wall theme), pillars with lamps on both sides.
+  // Wings swing inward: angle = pos * 90 / 100 degrees, visualised as cosine shrink.
+  _svgCover(pos, isOpening, isClosing, isStopped, isClosed, isMoving, lightOn = false, lockOn = false) {
+    const t       = this.t;
+    const angleDeg = (pos / 100) * 90;
+    const cosA     = Math.cos(angleDeg * Math.PI / 180);
+
+    // Layout constants — shifted down 90px so lamp clears top of viewBox (560×310)
+    const LHX = 178; // left hinge X  (280 - GW)
+    const RHX = 382; // right hinge X (280 + GW) — wings meet exactly at centre
+    const GT  = 132; // gate top Y  (was 42 + 90)
+    const GB  = 268; // gate bottom Y (was 178 + 90)
+    const GH  = GB - GT;
+    const GW  = 102; // full gate wing width (closed)
+    const visW = Math.max(1, GW * cosA);
+
+    // Pillar dims
+    const PW = 38;
+    const PH = 148;
+    const PY = 120; // was 30 + 90
+
+    // Light glow
+    const lampFill  = lightOn ? '#ffe066' : '#1a1a0a';
+    const lampStroke= lightOn ? '#ffcc44' : '#2a2a1a';
+    const glowA     = lightOn ? '0.9' : '0';
+
+    // Motion indicator
+    const pirFill   = isMoving ? '#00aa44' : '#0a1a0a';
+    const pirStroke = isMoving ? '#00aa44' : '#1a3a1a';
+    const movAnim   = isMoving ? 'animation:cvPulse .8s ease-in-out infinite;' : '';
+
+    // Vertical energy-line animations — run along the inner edge of each pillar
+    // Opening: line travels bottom → top (from GB up to PY)
+    // Closing:  line travels top → bottom (from PY down to GB)
+    const lineX_L = LHX + 3;   // inner edge of left pillar  (just inside, toward gate)
+    const lineX_R = RHX - 3;   // inner edge of right pillar (just inside, toward gate)
+    const lineTop  = PY;        // top of pillar body
+    const lineBot  = GB + 1;    // bottom of pillar body (base top)
+    const arcLen   = lineBot - lineTop; // total path length
+
+    const sweepKeyframes = `
+@keyframes riseUp {
+  0%   { stroke-dashoffset: ${arcLen};  opacity: 1; }
+  80%  { stroke-dashoffset: 0;          opacity: 1; }
+  100% { stroke-dashoffset: 0;          opacity: 0; }
+}
+@keyframes fallDown {
+  0%   { stroke-dashoffset: 0;          opacity: 1; }
+  80%  { stroke-dashoffset: ${arcLen};  opacity: 1; }
+  100% { stroke-dashoffset: ${arcLen};  opacity: 0; }
+}
+@keyframes glintRise {
+  0%   { stroke-dashoffset: ${arcLen + 18}; }
+  100% { stroke-dashoffset: -18; }
+}
+@keyframes glintFall {
+  0%   { stroke-dashoffset: -18; }
+  100% { stroke-dashoffset: ${arcLen + 18}; }
+}`;
+
+    // Helper: vertical line SVG (bottom to top = pathStart at bottom, drawn upward)
+    // SVG lines go top→bottom normally; to animate bottom→top we flip dash direction:
+    //   path goes from lineBot to lineTop (upward), dashoffset starts full (hidden) → 0 (revealed)
+    const lLinePath = `M ${lineX_L} ${lineBot} L ${lineX_L} ${lineTop}`;
+    const rLinePath = `M ${lineX_R} ${lineBot} L ${lineX_R} ${lineTop}`;
+
+    const arcOpen = isOpening ? `
+<defs><style>${sweepKeyframes}</style></defs>
+<g>
+  <!-- left pillar rise line -->
+  <line x1="${lineX_L}" y1="${lineTop}" x2="${lineX_L}" y2="${lineBot}" stroke="rgba(34,204,119,0.15)" stroke-width="8" stroke-linecap="round"/>
+  <path d="${lLinePath}" fill="none" stroke="#22cc77" stroke-width="3" stroke-linecap="round"
+    stroke-dasharray="${arcLen}" stroke-dashoffset="${arcLen}"
+    style="animation:riseUp .8s ease-out infinite"/>
+  <path d="${lLinePath}" fill="none" stroke="rgba(180,255,220,0.9)" stroke-width="1.5" stroke-linecap="round"
+    stroke-dasharray="10 ${arcLen}" stroke-dashoffset="${arcLen + 18}"
+    style="animation:glintRise .8s linear infinite"/>
+  <!-- right pillar rise line -->
+  <line x1="${lineX_R}" y1="${lineTop}" x2="${lineX_R}" y2="${lineBot}" stroke="rgba(34,204,119,0.15)" stroke-width="8" stroke-linecap="round"/>
+  <path d="${rLinePath}" fill="none" stroke="#22cc77" stroke-width="3" stroke-linecap="round"
+    stroke-dasharray="${arcLen}" stroke-dashoffset="${arcLen}"
+    style="animation:riseUp .8s ease-out infinite"/>
+  <path d="${rLinePath}" fill="none" stroke="rgba(180,255,220,0.9)" stroke-width="1.5" stroke-linecap="round"
+    stroke-dasharray="10 ${arcLen}" stroke-dashoffset="${arcLen + 18}"
+    style="animation:glintRise .8s linear infinite"/>
+</g>` : '';
+
+    const arcClose = isClosing ? `
+<defs><style>${sweepKeyframes}</style></defs>
+<g>
+  <!-- left pillar fall line -->
+  <line x1="${lineX_L}" y1="${lineTop}" x2="${lineX_L}" y2="${lineBot}" stroke="rgba(51,170,255,0.15)" stroke-width="8" stroke-linecap="round"/>
+  <path d="${lLinePath}" fill="none" stroke="#33aaff" stroke-width="3" stroke-linecap="round"
+    stroke-dasharray="${arcLen}" stroke-dashoffset="0"
+    style="animation:fallDown .8s ease-in infinite"/>
+  <path d="${lLinePath}" fill="none" stroke="rgba(180,230,255,0.9)" stroke-width="1.5" stroke-linecap="round"
+    stroke-dasharray="10 ${arcLen}" stroke-dashoffset="-18"
+    style="animation:glintFall .8s linear infinite"/>
+  <!-- right pillar fall line -->
+  <line x1="${lineX_R}" y1="${lineTop}" x2="${lineX_R}" y2="${lineBot}" stroke="rgba(51,170,255,0.15)" stroke-width="8" stroke-linecap="round"/>
+  <path d="${rLinePath}" fill="none" stroke="#33aaff" stroke-width="3" stroke-linecap="round"
+    stroke-dasharray="${arcLen}" stroke-dashoffset="0"
+    style="animation:fallDown .8s ease-in infinite"/>
+  <path d="${rLinePath}" fill="none" stroke="rgba(180,230,255,0.9)" stroke-width="1.5" stroke-linecap="round"
+    stroke-dasharray="10 ${arcLen}" stroke-dashoffset="-18"
+    style="animation:glintFall .8s linear infinite"/>
+</g>` : '';
+
+    const arrowOpen  = arcOpen;
+    const arrowClose = arcClose;
+
+    // Left wing: hinge at LHX, free end to the right (open → free end moves right)
+    const lwX0 = LHX;
+    const lwX1 = LHX + visW;
+    // Right wing: hinge at RHX, free end to the left
+    const rwX0 = RHX - visW;
+    const rwX1 = RHX;
+
+    // Wing face gradient
+    const wGradL = `<linearGradient id="cvWL" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#4a6878"/><stop offset="30%" stop-color="#7ab0cc"/><stop offset="60%" stop-color="#9ad0e8"/><stop offset="100%" stop-color="#4a6878"/></linearGradient>`;
+    const wGradR = `<linearGradient id="cvWR" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#4a6878"/><stop offset="40%" stop-color="#9ad0e8"/><stop offset="70%" stop-color="#7ab0cc"/><stop offset="100%" stop-color="#4a6878"/></linearGradient>`;
+
+    // Slats for each wing
+    const numSlats = 10;
+    const slatH    = 9;
+    const slatGap  = (GH - numSlats * slatH) / (numSlats + 1);
+    const buildSlats = (x0, x1) => {
+      let s = '';
+      for (let i = 0; i < numSlats; i++) {
+        const sy = GT + slatGap + i * (slatH + slatGap);
+        s += `<rect x="${x0.toFixed(1)}" y="${sy.toFixed(1)}" width="${Math.max(0,x1-x0).toFixed(1)}" height="${slatH}" rx="0" fill="url(#cvSL)" stroke="none"/>`;
+        s += `<line x1="${(x0+2).toFixed(1)}" y1="${(sy+1).toFixed(1)}" x2="${(x1-2).toFixed(1)}" y2="${(sy+1).toFixed(1)}" stroke="rgba(200,240,255,0.45)" stroke-width="0.7"/>`;
+        s += `<line x1="${(x0+2).toFixed(1)}" y1="${(sy+slatH-1).toFixed(1)}" x2="${(x1-2).toFixed(1)}" y2="${(sy+slatH-1).toFixed(1)}" stroke="rgba(0,0,0,0.35)" stroke-width="0.8"/>`;
+      }
+      return s;
+    };
+    const slatGrad = `<linearGradient id="cvSL" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#4a6878"/><stop offset="30%" stop-color="#8abcd0"/><stop offset="60%" stop-color="#b0d8ec"/><stop offset="100%" stop-color="#5a8098"/></linearGradient>`;
+
+    // Stiffeners
+    const buildStiffeners = (x0, x1) => {
+      if (x1 - x0 < 4) return '';
+      const w = x1 - x0;
+      return [0.33, 0.66].map(f => {
+        const sx = (x0 + f * w).toFixed(1);
+        return `<line x1="${sx}" y1="${GT}" x2="${sx}" y2="${GB}" stroke="rgba(20,50,70,0.7)" stroke-width="4"/>
+                <line x1="${(parseFloat(sx)+1).toFixed(1)}" y1="${GT}" x2="${(parseFloat(sx)+1).toFixed(1)}" y2="${GB}" stroke="rgba(130,200,230,0.25)" stroke-width="0.8"/>`;
+      }).join('');
+    };
+
+    // Top decorative strip
+    const buildTopStrip = (x0, x1) => {
+      if (x1 - x0 < 4) return '';
+      const w = x1 - x0;
+      let s = `<rect x="${x0.toFixed(1)}" y="${GT}" width="${w.toFixed(1)}" height="8" rx="0" fill="rgba(8,20,36,0.55)"/>`;
+      for (let i = 0; i < 4; i++) {
+        const bx = (x0 + (0.15 + i * 0.23) * w).toFixed(1);
+        s += `<circle cx="${bx}" cy="${(GT+4).toFixed(1)}" r="2" fill="rgba(15,45,65,0.9)"/>`;
+      }
+      return s;
+    };
+
+    // Hinge bolts
+    const buildHingeBolts = (hx) => {
+      return [GT + 22, GB - 22].map(hy => `
+        <circle cx="${hx}" cy="${hy}" r="4.5" fill="#1a3a50" stroke="#5a8aaa" stroke-width="0.8"/>
+        <circle cx="${hx}" cy="${hy}" r="2" fill="#3a6a80"/>
+      `).join('');
+    };
+
+    // Pillar with lamp
+    const buildPillar = (hingeX, side) => {
+      const px = side === 'left' ? hingeX - PW : hingeX;
+      const pcx = px + PW / 2;
+      const gradId = `cvPl${side}`;
+      let grad, capGrad;
+      // Stone/granite texture — warm grey with subtle veining
+      if (side === 'left') {
+        grad = `<linearGradient id="${gradId}" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stop-color="#4a4540"/>
+          <stop offset="20%"  stop-color="#7a7268"/>
+          <stop offset="45%"  stop-color="#9a9088"/>
+          <stop offset="65%"  stop-color="#8a8078"/>
+          <stop offset="85%"  stop-color="#6a6258"/>
+          <stop offset="100%" stop-color="#4a4540"/>
+        </linearGradient>`;
+      } else {
+        grad = `<linearGradient id="${gradId}" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stop-color="#4a4540"/>
+          <stop offset="15%"  stop-color="#6a6258"/>
+          <stop offset="35%"  stop-color="#8a8078"/>
+          <stop offset="55%"  stop-color="#9a9088"/>
+          <stop offset="80%"  stop-color="#7a7268"/>
+          <stop offset="100%" stop-color="#4a4540"/>
+        </linearGradient>`;
+      }
+      capGrad = `<linearGradient id="${gradId}C" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%"   stop-color="#3e3a36"/>
+        <stop offset="50%"  stop-color="#a09888"/>
+        <stop offset="100%" stop-color="#3e3a36"/>
+      </linearGradient>`;
+
+      // shadow ellipse
+      const shadowEl = `<ellipse cx="${pcx}" cy="${GB+7}" rx="${PW*0.6}" ry="4" fill="rgba(0,0,0,0.32)"/>`;
+
+      // pillar body — stone texture
+      const body = `<rect x="${px}" y="${PY}" width="${PW}" height="${PH}" rx="3" fill="url(#${gradId})" stroke="#2e2a26" stroke-width="0.8"/>`;
+
+      // groove lines (mortar joints — horizontal bands)
+      const grooves = [PY+18, PY+40, PY+62, PY+84, PY+106, PY+128].map(gy =>
+        `<line x1="${px+2}" y1="${gy}" x2="${px+PW-2}" y2="${gy}" stroke="rgba(0,0,0,0.35)" stroke-width="1.2"/>
+         <line x1="${px+2}" y1="${gy+1}" x2="${px+PW-2}" y2="${gy+1}" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>`).join('');
+
+      // subtle diagonal vein lines for granite look
+      const veins = `
+        <line x1="${px+6}"  y1="${PY+10}"  x2="${px+18}" y2="${PY+55}"  stroke="rgba(255,255,255,0.06)" stroke-width="0.8"/>
+        <line x1="${px+22}" y1="${PY+30}"  x2="${px+32}" y2="${PY+90}"  stroke="rgba(0,0,0,0.08)"       stroke-width="0.6"/>
+        <line x1="${px+10}" y1="${PY+70}"  x2="${px+28}" y2="${PY+130}" stroke="rgba(255,255,255,0.05)" stroke-width="0.7"/>`;
+
+      // cap + base
+      const cap  = `<rect x="${px-5}" y="${PY-8}" width="${PW+10}" height="10" rx="3" fill="url(#${gradId}C)" stroke="#2a2622" stroke-width="0.6"/>`;
+      const base = `<rect x="${px-4}" y="${GB+1}" width="${PW+8}" height="8" rx="2" fill="#3a3632" stroke="#222" stroke-width="0.5"/>`;
+
+      // lamp — simple round bulb sitting directly on top of pillar cap
+      const capTopY = PY - 8; // top of cap rect
+      const bulbCY  = capTopY - 13; // bulb centre just above cap
+      const bulbR   = 13;
+      const bulb = lightOn
+        ? `<circle cx="${pcx}" cy="${bulbCY}" r="${bulbR+10}" fill="rgba(255,220,60,0.14)"/>
+           <circle cx="${pcx}" cy="${bulbCY}" r="${bulbR+5}" fill="rgba(255,210,40,0.26)"/>
+           <circle cx="${pcx}" cy="${bulbCY}" r="${bulbR}" fill="#fffbe6" stroke="#ffe066" stroke-width="1.4"/>
+           <circle cx="${pcx}" cy="${bulbCY}" r="${bulbR-4}" fill="#fff7c0"/>`
+        : `<circle cx="${pcx}" cy="${bulbCY}" r="${bulbR}" fill="#d8d8d8" stroke="#aaa" stroke-width="1"/>
+           <circle cx="${pcx}" cy="${bulbCY}" r="${bulbR-4}" fill="#c8c8c8"/>`;
+      // small socket/base connecting bulb to cap
+      const socket = `<rect x="${pcx-5}" y="${bulbCY+bulbR-2}" width="10" height="9" rx="2" fill="#3a4a5a" stroke="#4a6a80" stroke-width="0.5"/>`;
+      const lampSlats = '';
+      const housingBase = '';
+      const pole = ''; const arm = ''; const housing = '';
+      const roof = ''; const finial = '';
+
+      // lock/intercom box on pillar
+      const bxCx = pcx;
+      const bxY  = PY + 42;
+      let boxContent = '';
+      if (side === 'left') {
+        // lock icon
+        boxContent = `
+<rect x="${bxCx-8}" y="${bxY}" width="16" height="24" rx="2" fill="#0a1520" stroke="#1e3a5a" stroke-width="0.6"/>
+<circle cx="${bxCx}" cy="${bxY+14}" r="3.5" fill="#0a1828" stroke="#00cc88" stroke-width="0.8"/>
+<rect x="${bxCx-2.5}" y="${bxY+13}" width="5" height="4" rx="1" fill="#00cc88"/>
+<path d="M${bxCx-2.5},${bxY+13} Q${bxCx-2.5},${bxY+9} ${bxCx},${bxY+9} Q${bxCx+2.5},${bxY+9} ${bxCx+2.5},${bxY+13}" fill="none" stroke="#00cc88" stroke-width="0.8" stroke-linecap="round"/>`;
+      } else {
+        // intercom dots
+        const dots = [[4,5],[8,5],[12,5],[4,9],[8,9],[12,9],[6,13],[10,13]];
+        boxContent = `<rect x="${bxCx-8}" y="${bxY}" width="16" height="24" rx="2" fill="#0a1520" stroke="#1e3a5a" stroke-width="0.6"/>` +
+          dots.map(([dx,dy]) => `<circle cx="${bxCx-8+dx}" cy="${bxY+dy}" r="0.9" fill="#2a4a5a"/>`).join('') +
+          `<circle cx="${bxCx}" cy="${bxY+18}" r="3.5" fill="#004a30" stroke="#00cc66" stroke-width="0.8"/>`;
+      }
+
+      return { defs: grad + capGrad, svg: `${shadowEl}${body}${grooves}${veins}${cap}${base}${socket}${bulb}${boxContent}` };
+    };
+
+    const lp = buildPillar(LHX, 'left');
+    const rp = buildPillar(RHX, 'right');
+
+    // Center lock icon (fades out as gate opens)
+    const lockAlpha = Math.max(0, 1 - angleDeg / 35);
+    const lockSvg = lockAlpha > 0 ? `
+<g opacity="${lockAlpha.toFixed(2)}">
+  <rect x="270" y="${(GT+GB)/2-14}" width="20" height="28" rx="2" fill="#0a1828" stroke="#1a4a6a" stroke-width="0.8"/>
+  <rect x="273" y="${(GT+GB)/2-8}" width="14" height="10" rx="2" fill="#0e2235" stroke="#00cc88" stroke-width="0.8"/>
+  <path d="M273,${(GT+GB)/2-8} Q273,${(GT+GB)/2-16} 280,${(GT+GB)/2-16} Q287,${(GT+GB)/2-16} 287,${(GT+GB)/2-8}" fill="none" stroke="#00cc88" stroke-width="1.2" stroke-linecap="round"/>
+  <circle cx="280" cy="${(GT+GB)/2-2}" r="2.5" fill="#001828" stroke="#00cc88" stroke-width="0.6"/>
+  <rect x="279" cy="${(GT+GB)/2-1}" width="2" height="4" rx="1" fill="#001828"/>
+</g>` : '';
+
+    // Fence wall segments — vertical slat style, fully transparent (no background rect)
+    const fenceSlats = (x0, x1, fenceH, fenceY) => {
+      const slotW = 7, gap = 5;
+      const step  = slotW + gap;
+      const count = Math.floor((x1 - x0) / step);
+      let s = '';
+      // top & bottom rail only
+      s += `<rect x="${x0}" y="${fenceY}" width="${x1-x0}" height="4" rx="0" fill="#2e3f52" opacity="0.75"/>`;
+      s += `<rect x="${x0}" y="${fenceY+fenceH-4}" width="${x1-x0}" height="4" rx="0" fill="#2e3f52" opacity="0.75"/>`;
+      for (let i = 0; i < count; i++) {
+        const sx = x0 + i * step + gap / 2;
+        s += `<rect x="${sx.toFixed(1)}" y="${(fenceY+4).toFixed(1)}" width="${slotW}" height="${(fenceH-8).toFixed(1)}" rx="2" fill="#3a5268" stroke="#4a6a82" stroke-width="0.5" opacity="0.85"/>`;
+        s += `<line x1="${(sx+1).toFixed(1)}" y1="${(fenceY+6).toFixed(1)}" x2="${(sx+1).toFixed(1)}" y2="${(fenceY+fenceH-6).toFixed(1)}" stroke="rgba(160,210,240,0.22)" stroke-width="0.6"/>`;
+      }
+      return s;
+    };
+    const fenceH  = PH - 10;
+    const fenceY  = PY + 8;
+    const fenceLeft  = fenceSlats(0, LHX - PW, fenceH, fenceY);
+    const fenceRight = fenceSlats(RHX + PW, 560, fenceH, fenceY);
+
+    // Ground rail only (no ground strip rect — transparent bg)
+    const groundRail = `<line x1="${LHX}" y1="${GB+3}" x2="${RHX}" y2="${GB+3}" stroke="#1a4a2a" stroke-width="1.5" stroke-dasharray="5,3" opacity="${Math.max(0.12, 0.65 - angleDeg / 90 * 0.53).toFixed(2)}"/>`;
+
+    return `
+<defs>
+  ${wGradL}${wGradR}${slatGrad}
+  ${lp.defs}${rp.defs}
+  <style>@keyframes cvBlink{0%,100%{opacity:1}50%{opacity:0.3}}@keyframes cvPulse{0%,100%{opacity:1}50%{opacity:0.35}}</style>
+</defs>
+${fenceLeft}${fenceRight}
+
+<!-- LEFT WING -->
+<g>
+  <rect x="${lwX0.toFixed(1)}" y="${GT}" width="${visW.toFixed(1)}" height="${GH}" rx="0" fill="url(#cvWL)" stroke="#aad8ee" stroke-width="1.2"/>
+  ${buildSlats(lwX0, lwX1)}
+  ${buildStiffeners(lwX0, lwX1)}
+  ${buildTopStrip(lwX0, lwX1)}
+  ${buildHingeBolts(LHX)}
+</g>
+
+<!-- RIGHT WING -->
+<g>
+  <rect x="${rwX0.toFixed(1)}" y="${GT}" width="${visW.toFixed(1)}" height="${GH}" rx="0" fill="url(#cvWR)" stroke="#aad8ee" stroke-width="1.2"/>
+  ${buildSlats(rwX0, rwX1)}
+  ${buildStiffeners(rwX0, rwX1)}
+  ${buildTopStrip(rwX0, rwX1)}
+  ${buildHingeBolts(RHX)}
+</g>
+
+${groundRail}
+${lockSvg}
+${arrowOpen}${arrowClose}
+
+<!-- PIR motion indicator -->
+<circle cx="${LHX - PW/2 - 8}" cy="${PY + PH*0.55}" r="4" fill="${pirFill}" stroke="${pirStroke}" stroke-width="0.7" style="${movAnim}"/>
+<text x="${LHX - PW/2 - 8}" y="${PY + PH*0.55 + 12}" text-anchor="middle" font-size="5.5" fill="#2a4a6a" font-family="monospace">PIR</text>
+
+<!-- PILLARS (drawn on top of wings) -->
+${lp.svg}
+${rp.svg}
+
+<text x="280" y="298" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.3)" font-family="monospace" letter-spacing="1">${t.position(pos)}</text>`;
+  }
+
   _bindEvents() {
     this.shadowRoot.addEventListener('click', e => {
       const el = e.target.closest('[data-action]');
@@ -1597,6 +1930,12 @@ ${this._config.entity_gate_lock ? (() => {
     const inner = this.shadowRoot.getElementById('inner');
     if (!inner) { this._buildDOM(); return; }
     inner.innerHTML = this._flipped ? this._backHTML() : this._frontHTML();
+    // Toggle transparent background for cover style back face
+    const card = this.shadowRoot.querySelector('.card');
+    if (card) {
+      const isCoverBack = this._flipped && (this._config.gate_style === 'cover' || this._config.gate_style === 'shutter');
+      card.toggleAttribute('data-cover-back', isCoverBack);
+    }
     // Re-bind inner click targets (shadowRoot listener already exists)
     this._patch();
     requestAnimationFrame(() => this._syncCamera());
@@ -1790,7 +2129,7 @@ class GateCardEditor extends HTMLElement {
 </style>
 <div class="editor">
   <div class="credit">🚧 <strong>Gate Card</strong>
-    <span style="color:var(--secondary-text-color);font-weight:400;">v1.2 Designed by @doanlong1412 from 🇻🇳 Vietnam</span>
+    <span style="color:var(--secondary-text-color);font-weight:400;">v1.3 Designed by @doanlong1412 from 🇻🇳 Vietnam</span>
   </div>
 
   <!-- 1. Language -->
@@ -1817,9 +2156,9 @@ class GateCardEditor extends HTMLElement {
       <span class="acc-arrow" id="arrow-style">${this._open.style?'▾':'▸'}</span>
     </div>
     <div class="acc-body" id="body-style" style="display:${this._open.style?'block':'none'}">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
         <div class="style-btn ${(cfg.gate_style||'slide')==='slide'?'on':''}" data-style="slide" style="cursor:pointer;border-radius:10px;border:2px solid ${(cfg.gate_style||'slide')==='slide'?'var(--primary-color)':'var(--divider-color)'};padding:10px 8px;background:var(--secondary-background-color);display:flex;flex-direction:column;align-items:center;gap:6px;">
-          <svg viewBox="0 0 80 40" width="64" height="32" style="display:block;">
+          <svg viewBox="0 0 80 40" width="60" height="30" style="display:block;">
             <rect x="0" y="5" width="78" height="32" rx="3" fill="#1a2a3a" stroke="#2a4a6a" stroke-width="1"/>
             <rect x="2" y="7" width="30" height="28" rx="2" fill="#2e4d60" stroke="#3a6070" stroke-width="0.5"/>
             <rect x="34" y="7" width="4" height="28" rx="1" fill="#2e4d60"/>
@@ -1830,10 +2169,10 @@ class GateCardEditor extends HTMLElement {
             <circle cx="70" cy="20" r="4" fill="#1e3050"/>
             <polygon points="66,20 61,16 61,18.5 55,18.5 55,21.5 61,21.5 61,24" fill="#ff8c00" opacity="0.8"/>
           </svg>
-          <span style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;color:${(cfg.gate_style||'slide')==='slide'?'var(--primary-color)':'var(--secondary-text-color)'};">${t.edStyleSlide}</span>
+          <span style="font-family:monospace;font-size:9px;font-weight:700;letter-spacing:0.8px;color:${(cfg.gate_style||'slide')==='slide'?'var(--primary-color)':'var(--secondary-text-color)'};">${t.edStyleSlide}</span>
         </div>
         <div class="style-btn ${(cfg.gate_style||'slide')==='shutter'?'on':''}" data-style="shutter" style="cursor:pointer;border-radius:10px;border:2px solid ${(cfg.gate_style||'slide')==='shutter'?'var(--primary-color)':'var(--divider-color)'};padding:10px 8px;background:var(--secondary-background-color);display:flex;flex-direction:column;align-items:center;gap:6px;">
-          <svg viewBox="0 0 80 40" width="64" height="32" style="display:block;">
+          <svg viewBox="0 0 80 40" width="60" height="30" style="display:block;">
             <rect x="0" y="0" width="80" height="40" rx="3" fill="#1a1e24" stroke="#3a4048" stroke-width="1"/>
             <rect x="0" y="0" width="80" height="10" rx="2" fill="#b8b4ac"/>
             <rect x="5" y="11" width="70" height="5" rx="1" fill="#c0b8a8" stroke="#a0a090" stroke-width="0.4"/>
@@ -1841,7 +2180,23 @@ class GateCardEditor extends HTMLElement {
             <rect x="5" y="25" width="70" height="5" rx="1" fill="#b0a898" stroke="#a0a090" stroke-width="0.4"/>
             <rect x="5" y="32" width="70" height="5" rx="1" fill="#a8a090" stroke="#a0a090" stroke-width="0.4"/>
           </svg>
-          <span style="font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;color:${(cfg.gate_style||'slide')==='shutter'?'var(--primary-color)':'var(--secondary-text-color)'};">${t.edStyleShutter}</span>
+          <span style="font-family:monospace;font-size:9px;font-weight:700;letter-spacing:0.8px;color:${(cfg.gate_style||'slide')==='shutter'?'var(--primary-color)':'var(--secondary-text-color)'};">${t.edStyleShutter}</span>
+        </div>
+        <div class="style-btn ${(cfg.gate_style||'slide')==='cover'?'on':''}" data-style="cover" style="cursor:pointer;border-radius:10px;border:2px solid ${(cfg.gate_style||'slide')==='cover'?'var(--primary-color)':'var(--divider-color)'};padding:10px 8px;background:var(--secondary-background-color);display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <svg viewBox="0 0 80 40" width="60" height="30" style="display:block;">
+            <rect x="0" y="2" width="80" height="36" rx="2" fill="#0d1520"/>
+            <rect x="0" y="4" width="14" height="32" rx="2" fill="#2a3a4e" stroke="#3a5570" stroke-width="0.8"/>
+            <rect x="66" y="4" width="14" height="32" rx="2" fill="#2a3a4e" stroke="#3a5570" stroke-width="0.8"/>
+            <rect x="14" y="8" width="22" height="26" rx="1" fill="#5a8ca8" stroke="#8ac8e0" stroke-width="0.8"/>
+            <line x1="21" y1="8" x2="21" y2="34" stroke="rgba(20,50,70,0.6)" stroke-width="3"/>
+            <line x1="28" y1="8" x2="28" y2="34" stroke="rgba(20,50,70,0.6)" stroke-width="3"/>
+            <rect x="44" y="8" width="22" height="26" rx="1" fill="#5a8ca8" stroke="#8ac8e0" stroke-width="0.8"/>
+            <line x1="51" y1="8" x2="51" y2="34" stroke="rgba(20,50,70,0.6)" stroke-width="3"/>
+            <line x1="58" y1="8" x2="58" y2="34" stroke="rgba(20,50,70,0.6)" stroke-width="3"/>
+            <circle cx="7" cy="10" r="3" fill="#1a1a0a" stroke="#2a2a1a" stroke-width="0.6"/>
+            <circle cx="73" cy="10" r="3" fill="#1a1a0a" stroke="#2a2a1a" stroke-width="0.6"/>
+          </svg>
+          <span style="font-family:monospace;font-size:9px;font-weight:700;letter-spacing:0.8px;color:${(cfg.gate_style||'slide')==='cover'?'var(--primary-color)':'var(--secondary-text-color)'};">${t.edStyleCover||'🚪 2-WING'}</span>
         </div>
       </div>
     </div>
@@ -2006,6 +2361,15 @@ class GateCardEditor extends HTMLElement {
       ${this._colorRow('btn_open_color',  t.btnOpenColor)}
       ${this._colorRow('btn_stop_color',  t.btnStopColor)}
       ${this._colorRow('btn_close_color', t.btnCloseColor)}
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--divider-color);">
+        <div class="sl-row">
+          <label>💧 Blur nền (backdrop)</label>
+          <input type="range" id="inp-backdrop-blur" min="0" max="30" step="1"
+            value="${cfg.backdrop_blur ?? 12}"
+            style="flex:1;accent-color:var(--primary-color);">
+          <span id="blur-val" class="slv">${cfg.backdrop_blur ?? 12}px</span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -2040,6 +2404,18 @@ class GateCardEditor extends HTMLElement {
 
   _bindEditorEvents() {
     const sr = this.shadowRoot;
+
+    // backdrop blur slider
+    const blurSlider = sr.getElementById('inp-backdrop-blur');
+    const blurVal    = sr.getElementById('blur-val');
+    if (blurSlider) {
+      blurSlider.addEventListener('input', () => {
+        const v = parseInt(blurSlider.value);
+        this._config = { ...this._config, backdrop_blur: v };
+        if (blurVal) blurVal.textContent = v + 'px';
+        this._fire();
+      });
+    }
 
     // accordion headers
     ['name','lang','bg','colors','style','entities'].forEach(id => {
@@ -2229,7 +2605,7 @@ window.customCards = window.customCards || [];
 window.customCards.push({
   type: 'gate-card',
   name: 'Gate Card',
-  description: 'Smart gate control card with live camera, SVG gate diagram, motion/person sensors and full visual editor. By @doanlong1412',
+  description: 'Smart gate control card with live camera, SVG gate diagram (slide/shutter/cover 2-wing), motion/person sensors and full visual editor. By @doanlong1412',
   preview: true,
   documentationURL: 'https://github.com/doanlong1412/gate-card',
 });
