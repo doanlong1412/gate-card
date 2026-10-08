@@ -178,8 +178,8 @@ Trạng thái lật giờ được lưu trong Home Assistant — không bị m�
 | `gate_title` | string | *(theo ngôn ngữ)* | Tên hiển thị trên card |
 | `gate_zone` | string | *(theo ngôn ngữ)* | Khu vực / phụ đề |
 | `home_name` | string | `MY HOME` | Nhãn trên hộp motor trong sơ đồ nhà xe |
-| `license_plate_line1` | string | `99A` | Biển số xe dòng 1 |
-| `license_plate_line2` | string | `873.76` | Biển số xe dòng 2 |
+| `plate_line1` | string | `99A` | Biển số xe dòng 1 |
+| `plate_line2` | string | `873.76` | Biển số xe dòng 2 |
 | `no_sensor` | boolean | `false` | Chế độ tính vị trí theo thời gian khi không có cảm biến |
 | `travel_time_sec` | number | `20` | Thời gian hành trình (giây) — yêu cầu `no_sensor: true` |
 | `background_preset` | string | `default` | Tên preset gradient |
@@ -203,8 +203,8 @@ gate_style: shutter
 gate_title: Nhà Xe
 gate_zone: ZONE-A · GARAGE CONTROL
 home_name: NHÀ XE
-license_plate_line1: 99A
-license_plate_line2: 873.76
+plate_line1: 99A
+plate_line2: 873.76
 no_sensor: false
 travel_time_sec: 20
 
@@ -261,7 +261,7 @@ entity_flipped: input_boolean.gate_card_flipped
 
 ### v1.1.0
 - 🏠 Kiểu sơ đồ mới `gate_style: shutter` — cửa cuốn nhà xe
-- 🚗 Biển số xe tùy chỉnh (`license_plate_line1` / `license_plate_line2`)
+- 🚗 Biển số xe tùy chỉnh (`plate_line1` / `plate_line2`)
 - 🏠 Tên My Home tùy chỉnh (`home_name`)
 - ⏱️ Chế độ không cảm biến (`no_sensor` + `travel_time_sec`)
 - 🌐 6 ngôn ngữ mới — 🇫🇷 🇳🇱 🇵🇱 🇸🇪 🇭🇺 🇨🇿 (tổng 10) với ảnh cờ thật

@@ -71,6 +71,35 @@ A custom Home Assistant Lovelace card for smart gate and garage door control —
 
 ---
 
+## 🌍 Country, car & house style (rolling shutter)
+
+All options are optional — without them the card looks exactly as before.
+
+![House styles](assets/house-themes.png)
+
+- **`house_theme`** — `beige` (default), `dark` (anthracite, fits dark mode), `white`, `brick` (flat roof with tiled fascia, brick wall with dark plinth, black sectional door with cassettes, white lanterns).
+- **`side_door`** — pedestrian door `right` (default), `left` or `none` (garage door centred).
+
+![Countries and cars](assets/countries-cars.png)
+
+- **`country`** — flag on the pole and licence plate band: `vn` (default), `de`, `at`, `ch`, `nl`, `fr`, `it`, `pl`, `se`, `hu`, `cz`, `gb`. EU countries get the blue EU band with stars and the country code, Dutch and British rear plates are yellow. If `plate_line2` is empty the plate is shown on one line.
+- **`car_brand`** — rear logo: `toyota` (default), `seat`, `vw`, `none`.
+- **`car_model`** — rear badge text (default `VIOS`, `''` hides it). Long names shrink automatically; SEAT shows it centred below the logo.
+- **`car_trim`** — trim badge on the right of the boot lid, e.g. `FR`.
+- **`car_color`** — body colour (hex); highlights and shadows are derived automatically.
+
+## 📷 Camera extras drawer
+
+![Camera extras](assets/camera-drawer.png)
+
+If any of these entities is set, the motion/person bar gets a small accent button. Tapping the bar opens a compact drawer:
+
+- **Vehicle / Animal** detection — highlighted while active, otherwise "x min ago".
+- **Floodlight** — tap to toggle, shows the mode from `entity_floodlight_mode`.
+- **Recording** — tap to toggle.
+
+On narrow cards (phones) the control buttons now show the icon above the label so all four fit.
+
 ## 📦 Installation
 
 ### Option 1 — HACS (recommended)
@@ -181,6 +210,11 @@ The flip state is now stored in Home Assistant. It persists across page reloads 
 | `entity_motion` | `binary_sensor` | Motion sensor |
 | `entity_person` | `binary_sensor` | Person / occupancy sensor |
 | `entity_flipped` | `input_boolean` | Flip state — see [Setting Up the Flip Button](#-setting-up-the-flip-button) |
+| `entity_vehicle` | `binary_sensor` | AI vehicle detection (camera extras drawer) |
+| `entity_animal` | `binary_sensor` | AI animal detection (camera extras drawer) |
+| `entity_floodlight` | `light` / `switch` | Camera floodlight, toggled from the drawer |
+| `entity_floodlight_mode` | `select` | Floodlight mode, shown as text |
+| `entity_recording` | `switch` | Camera recording on/off, toggled from the drawer |
 
 ---
 
@@ -193,8 +227,15 @@ The flip state is now stored in Home Assistant. It persists across page reloads 
 | `gate_title` | string | *(lang default)* | Display name shown on the card |
 | `gate_zone` | string | *(lang default)* | Zone / subtitle text |
 | `home_name` | string | `MY HOME` | Label on motor box in garage diagram |
-| `license_plate_line1` | string | `99A` | Car plate line 1 |
-| `license_plate_line2` | string | `873.76` | Car plate line 2 |
+| `plate_line1` | string | `99A` | Car plate line 1 |
+| `plate_line2` | string | `873.76` | Car plate line 2 (empty = single-line plate outside `vn`) |
+| `country` | string | `vn` | Flag and plate band: `vn`/`de`/`at`/`ch`/`nl`/`fr`/`it`/`pl`/`se`/`hu`/`cz`/`gb` |
+| `house_theme` | string | `beige` | Garage house style: `beige`/`dark`/`white`/`brick` |
+| `side_door` | string | `right` | Pedestrian door: `right`/`left`/`none` |
+| `car_brand` | string | `toyota` | Rear logo: `toyota`/`seat`/`vw`/`none` |
+| `car_model` | string | `VIOS` | Rear badge text (`''` = none) |
+| `car_trim` | string | — | Trim badge on the right, e.g. `FR` |
+| `car_color` | hex | `#c8bc98` | Car body colour |
 | `no_sensor` | boolean | `false` | Timer-based position when no sensor exists |
 | `travel_time_sec` | number | `20` | Travel time in seconds (requires `no_sensor: true`) |
 | `invert_sensor` | boolean | `false` | Invert sensor value — use if 100% means closed |
@@ -257,8 +298,8 @@ gate_style: shutter
 gate_title: Garage
 gate_zone: ZONE-A · GARAGE CONTROL
 home_name: MY HOME
-license_plate_line1: 99A
-license_plate_line2: 873.76
+plate_line1: 99A
+plate_line2: 873.76
 no_sensor: false
 travel_time_sec: 20
 
@@ -344,7 +385,7 @@ entity_flipped: input_boolean.main_gate_flipped
 
 ### v1.1.0
 - 🏠 New `gate_style: shutter` — rolling shutter garage diagram
-- 🚗 Customisable license plate (`license_plate_line1` / `license_plate_line2`)
+- 🚗 Customisable license plate (`plate_line1` / `plate_line2`)
 - 🏠 Custom home name (`home_name`)
 - ⏱️ No-sensor timer mode (`no_sensor` + `travel_time_sec`)
 - 🌐 6 new languages — 🇫🇷 🇳🇱 🇵🇱 🇸🇪 🇭🇺 🇨🇿 (10 total) with real flag images

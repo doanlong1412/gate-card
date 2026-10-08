@@ -13,7 +13,14 @@
  *
  * ─── What's new in v1.1.0 ────────────────────────────────────────────────────
  *  🏠 gate_style: 'shutter'  — Rolling shutter / garage door diagram
- *  🚗 license_plate_line1 / license_plate_line2
+ *  🚗 plate_line1 / plate_line2
+ *  🌍 country: flag on the pole + licence plate band (vn, de, at, ch, nl, fr, it, pl, se, hu, cz, gb)
+ *  🚙 car_brand: rear logo (toyota, seat, vw, none) · car_model: rear badge text · car_trim: trim badge on the right (e.g. FR)
+ *     car_color: body colour
+ *  🏠 house_theme: garage house look (beige, dark, white, brick – brick has a flat roof and an arched gate)
+ *  🚪 side_door: pedestrian door right (default), left or none (garage door centred)
+ *  📷 camera extras: entity_vehicle, entity_animal, entity_floodlight, entity_floodlight_mode, entity_recording –
+ *     tap the motion/person bar to open a drawer with them
  *  🏠 home_name
  *  ⏱  no_sensor + travel_time_sec
  *  🌐 6 new languages (total 10)
@@ -66,6 +73,14 @@ const TRANSLATIONS = {
     edGateZone: '📍 Zone / mô tả phụ',
     edPlate1: '🚗 Biển số xe (dòng 1)',
     edPlate2: '🚗 Biển số xe (dòng 2)',
+    edCountry: '🌍 Quốc gia (cờ & biển số)',
+    edHouseTheme: '🏠 Kiểu nhà',
+    vehicle: 'Xe', animal: 'Động vật', floodlight: 'Đèn pha', recording: 'Ghi hình', recOn: 'Đang ghi', recOff: 'Tạm dừng', now: 'bây giờ', edCarTrim: '🚙 Phiên bản (vd. FR)', edSideDoor: '🚪 Cửa phụ', sideDoors: { left: 'Trái', right: 'Phải', none: 'Không' }, on: 'BẬT', off: 'TẮT', floodModes: { off: 'tắt', auto: 'tự động', schedule: 'lịch' },
+    entityVehicle: '🚗 Xe (AI)', entityAnimal: '🐾 Động vật (AI)', entityFloodlight: '🔦 Đèn pha camera', entityFloodlightMode: '🔦 Chế độ đèn pha', entityRecording: '⏺ Ghi hình camera',
+    houseThemes: { beige: 'Be', dark: 'Tối', white: 'Trắng', brick: 'Gạch' },
+    edCarBrand: '🚙 Hãng xe (logo)',
+    edCarModel: '🚙 Dòng xe (chữ đuôi xe)',
+    edCarColor: '🎨 Màu xe',
     edSensorPos: '📡 Cảm biến cổng',
     edHomeName: '🏠 Tên My Home',
     edNoSensor: '⏱ Không có cảm biến vị trí',
@@ -119,6 +134,14 @@ const TRANSLATIONS = {
     edGateZone: '📍 Zone / subtitle',
     edPlate1: '🚗 License plate (line 1)',
     edPlate2: '🚗 License plate (line 2)',
+    edCountry: '🌍 Country (flag & plate)',
+    edHouseTheme: '🏠 House style',
+    vehicle: 'Vehicle', animal: 'Animal', floodlight: 'Floodlight', recording: 'Recording', recOn: 'on', recOff: 'paused', now: 'now', edCarTrim: '🚙 Trim badge (e.g. FR)', edSideDoor: '🚪 Side door', sideDoors: { left: 'Left', right: 'Right', none: 'None' }, on: 'ON', off: 'OFF', floodModes: { off: 'off', auto: 'auto', schedule: 'schedule' },
+    entityVehicle: '🚗 Vehicle detection', entityAnimal: '🐾 Animal detection', entityFloodlight: '🔦 Camera floodlight', entityFloodlightMode: '🔦 Floodlight mode', entityRecording: '⏺ Camera recording',
+    houseThemes: { beige: 'Beige', dark: 'Dark', white: 'White', brick: 'Brick' },
+    edCarBrand: '🚙 Car brand (logo)',
+    edCarModel: '🚙 Car model (rear badge)',
+    edCarColor: '🎨 Car colour',
     edSensorPos: '📡 Gate sensor',
     edHomeName: '🏠 My Home name',
     edNoSensor: '⏱ No position sensor',
@@ -172,6 +195,14 @@ const TRANSLATIONS = {
     edGateZone: '📍 Zone / Untertitel',
     edPlate1: '🚗 Kennzeichen (Zeile 1)',
     edPlate2: '🚗 Kennzeichen (Zeile 2)',
+    edCountry: '🌍 Land (Fahne & Kennzeichen)',
+    edHouseTheme: '🏠 Haus-Stil',
+    vehicle: 'Fahrzeug', animal: 'Tier', floodlight: 'Scheinwerfer', recording: 'Aufnahme', recOn: 'läuft', recOff: 'pausiert', now: 'jetzt', edCarTrim: '🚙 Ausstattung (z. B. FR)', edSideDoor: '🚪 Pforte', sideDoors: { left: 'Links', right: 'Rechts', none: 'Keine' }, on: 'AN', off: 'AUS', floodModes: { off: 'manuell', auto: 'Auto', schedule: 'Zeitplan' },
+    entityVehicle: '🚗 Fahrzeug-Erkennung', entityAnimal: '🐾 Tier-Erkennung', entityFloodlight: '🔦 Kamera-Scheinwerfer', entityFloodlightMode: '🔦 Scheinwerfer-Modus', entityRecording: '⏺ Kamera-Aufzeichnung',
+    houseThemes: { beige: 'Beige', dark: 'Anthrazit', white: 'Weiß', brick: 'Klinker' },
+    edCarBrand: '🚙 Automarke (Logo)',
+    edCarModel: '🚙 Modell (Schriftzug)',
+    edCarColor: '🎨 Autofarbe',
     edSensorPos: '📡 Tor-Sensor',
     edHomeName: '🏠 My Home Name',
     edNoSensor: '⏱ Kein Positionssensor',
@@ -225,6 +256,12 @@ const TRANSLATIONS = {
     edGateZone: '📍 Zone / sous-titre',
     edPlate1: '🚗 Plaque (ligne 1)',
     edPlate2: '🚗 Plaque (ligne 2)',
+    edCountry: '🌍 Pays (drapeau & plaque)',
+    edHouseTheme: '🏠 Style de maison',
+    houseThemes: { beige: 'Beige', dark: 'Anthracite', white: 'Blanc', brick: 'Brique' },
+    edCarBrand: '🚙 Marque (logo)',
+    edCarModel: '🚙 Modèle (badge arrière)',
+    edCarColor: '🎨 Couleur de la voiture',
     edSensorPos: '📡 Capteur de portail',
     edHomeName: '🏠 Nom My Home',
     edNoSensor: '⏱ Pas de capteur de position',
@@ -278,6 +315,12 @@ const TRANSLATIONS = {
     edGateZone: '📍 Zone / ondertitel',
     edPlate1: '🚗 Kenteken (regel 1)',
     edPlate2: '🚗 Kenteken (regel 2)',
+    edCountry: '🌍 Land (vlag & kenteken)',
+    edHouseTheme: '🏠 Huisstijl',
+    houseThemes: { beige: 'Beige', dark: 'Antraciet', white: 'Wit', brick: 'Baksteen' },
+    edCarBrand: '🚙 Automerk (logo)',
+    edCarModel: '🚙 Model (achterlogo)',
+    edCarColor: '🎨 Autokleur',
     edSensorPos: '📡 Poortsensor',
     edHomeName: '🏠 My Home naam',
     edNoSensor: '⏱ Geen positiesensor',
@@ -331,6 +374,12 @@ const TRANSLATIONS = {
     edGateZone: '📍 Strefa / podtytuł',
     edPlate1: '🚗 Tablica rejestracyjna (linia 1)',
     edPlate2: '🚗 Tablica rejestracyjna (linia 2)',
+    edCountry: '🌍 Kraj (flaga i tablica)',
+    edHouseTheme: '🏠 Styl domu',
+    houseThemes: { beige: 'Beżowy', dark: 'Antracyt', white: 'Biały', brick: 'Cegła' },
+    edCarBrand: '🚙 Marka (logo)',
+    edCarModel: '🚙 Model (napis z tyłu)',
+    edCarColor: '🎨 Kolor auta',
     edSensorPos: '📡 Czujnik bramy',
     edHomeName: '🏠 Nazwa My Home',
     edNoSensor: '⏱ Brak czujnika pozycji',
@@ -384,6 +433,12 @@ const TRANSLATIONS = {
     edGateZone: '📍 Zon / underrubrik',
     edPlate1: '🚗 Registreringsskylt (rad 1)',
     edPlate2: '🚗 Registreringsskylt (rad 2)',
+    edCountry: '🌍 Land (flagga & skylt)',
+    edHouseTheme: '🏠 Husstil',
+    houseThemes: { beige: 'Beige', dark: 'Antracit', white: 'Vit', brick: 'Tegel' },
+    edCarBrand: '🚙 Bilmärke (logotyp)',
+    edCarModel: '🚙 Modell (emblem bak)',
+    edCarColor: '🎨 Bilfärg',
     edSensorPos: '📡 Grindgivare',
     edHomeName: '🏠 My Home namn',
     edNoSensor: '⏱ Ingen positionssensor',
@@ -437,6 +492,12 @@ const TRANSLATIONS = {
     edGateZone: '📍 Zóna / alcím',
     edPlate1: '🚗 Rendszám (1. sor)',
     edPlate2: '🚗 Rendszám (2. sor)',
+    edCountry: '🌍 Ország (zászló és rendszám)',
+    edHouseTheme: '🏠 Ház stílusa',
+    houseThemes: { beige: 'Bézs', dark: 'Antracit', white: 'Fehér', brick: 'Tégla' },
+    edCarBrand: '🚙 Autómárka (logó)',
+    edCarModel: '🚙 Modell (hátsó felirat)',
+    edCarColor: '🎨 Autó színe',
     edSensorPos: '📡 Kapuérzékelő',
     edHomeName: '🏠 My Home neve',
     edNoSensor: '⏱ Nincs pozícióérzékelő',
@@ -490,6 +551,12 @@ const TRANSLATIONS = {
     edGateZone: '📍 Zóna / podnadpis',
     edPlate1: '🚗 Registrační značka (řádek 1)',
     edPlate2: '🚗 Registrační značka (řádek 2)',
+    edCountry: '🌍 Země (vlajka a značka)',
+    edHouseTheme: '🏠 Styl domu',
+    houseThemes: { beige: 'Béžová', dark: 'Antracit', white: 'Bílá', brick: 'Cihla' },
+    edCarBrand: '🚙 Značka auta (logo)',
+    edCarModel: '🚙 Model (nápis vzadu)',
+    edCarColor: '🎨 Barva auta',
     edSensorPos: '📡 Snímač brány',
     edHomeName: '🏠 Název My Home',
     edNoSensor: '⏱ Bez snímače polohy',
@@ -543,6 +610,12 @@ const TRANSLATIONS = {
     edGateZone: '📍 Zona / sottotitolo',
     edPlate1: '🚗 Targa (riga 1)',
     edPlate2: '🚗 Targa (riga 2)',
+    edCountry: '🌍 Paese (bandiera e targa)',
+    edHouseTheme: '🏠 Stile casa',
+    houseThemes: { beige: 'Beige', dark: 'Antracite', white: 'Bianco', brick: 'Mattoni' },
+    edCarBrand: '🚙 Marca auto (logo)',
+    edCarModel: '🚙 Modello (scritta posteriore)',
+    edCarColor: '🎨 Colore auto',
     edSensorPos: '📡 Sensore cancello',
     edHomeName: '🏠 Nome My Home',
     edNoSensor: '⏱ Nessun sensore posizione',
@@ -616,7 +689,150 @@ const DEFAULT_CONFIG = {
   travel_time_sec: 20,
   use_lock: false,
   backdrop_blur: 12,
+  country: 'vn',          // flag + licence plate band (shutter style)
+  car_brand: 'toyota',    // rear logo: toyota | seat | vw | none
+  car_model: 'VIOS',      // rear badge text ('' = none)
+  car_trim: '',           // trim badge on the right side of the boot ('' = none), e.g. FR
+  car_color: '#c8bc98',   // car body colour
+  house_theme: 'beige',   // garage house look: beige | dark | white | brick
+  side_door: 'right',     // pedestrian door: right | left | none
+  entity_vehicle: '',          // camera extras (optional): AI vehicle detection
+  entity_animal: '',           //   AI animal detection
+  entity_floodlight: '',       //   camera floodlight (light)
+  entity_floodlight_mode: '',  //   floodlight mode (select, shown as text)
+  entity_recording: '',        //   recording on/off (switch)
 };
+
+// ─── Country flag, licence plate & car (shutter style) ───────────────────────
+const COUNTRIES = {
+  vn: 'Việt Nam', de: 'Deutschland', at: 'Österreich', ch: 'Schweiz', nl: 'Nederland', fr: 'France',
+  it: 'Italia', pl: 'Polska', se: 'Sverige', hu: 'Magyarország', cz: 'Česko', gb: 'United Kingdom',
+};
+const CAR_BRANDS = { toyota: 'Toyota', seat: 'SEAT', vw: 'Volkswagen', none: '—' };
+
+// Flag inside the box x,y,w,h
+function flagSvg(c, x, y, w, h) {
+  const hz = (a, b, d) => `<rect x="${x}" y="${y}" width="${w}" height="${h / 3}" fill="${a}"/><rect x="${x}" y="${y + h / 3}" width="${w}" height="${h / 3}" fill="${b}"/><rect x="${x}" y="${y + 2 * h / 3}" width="${w}" height="${h / 3}" fill="${d}"/>`;
+  const vt = (a, b, d) => `<rect x="${x}" y="${y}" width="${w / 3}" height="${h}" fill="${a}"/><rect x="${x + w / 3}" y="${y}" width="${w / 3}" height="${h}" fill="${b}"/><rect x="${x + 2 * w / 3}" y="${y}" width="${w / 3}" height="${h}" fill="${d}"/>`;
+  switch (c) {
+    case 'de': return hz('#000000', '#dd0000', '#ffce00');
+    case 'at': return hz('#ed2939', '#ffffff', '#ed2939');
+    case 'nl': return hz('#ae1c28', '#ffffff', '#21468b');
+    case 'hu': return hz('#ce2939', '#ffffff', '#477050');
+    case 'fr': return vt('#002395', '#ffffff', '#ed2939');
+    case 'it': return vt('#009246', '#ffffff', '#ce2b37');
+    case 'pl': return `<rect x="${x}" y="${y}" width="${w}" height="${h / 2}" fill="#ffffff"/><rect x="${x}" y="${y + h / 2}" width="${w}" height="${h / 2}" fill="#dc143c"/>`;
+    case 'cz': return `<rect x="${x}" y="${y}" width="${w}" height="${h / 2}" fill="#ffffff"/><rect x="${x}" y="${y + h / 2}" width="${w}" height="${h / 2}" fill="#d7141a"/><polygon points="${x},${y} ${x + w / 2},${y + h / 2} ${x},${y + h}" fill="#11457e"/>`;
+    case 'se': return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#006aa7"/><rect x="${x + w * 5 / 16}" y="${y}" width="${w / 8}" height="${h}" fill="#fecc00"/><rect x="${x}" y="${y + h * 2 / 5}" width="${w}" height="${h / 5}" fill="#fecc00"/>`;
+    case 'ch': return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#da291c"/><rect x="${x + w / 2 - 2.5}" y="${y + h / 2 - 8}" width="5" height="16" fill="#ffffff"/><rect x="${x + w / 2 - 8}" y="${y + h / 2 - 2.5}" width="16" height="5" fill="#ffffff"/>`;
+    case 'gb': return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#012169"/>
+      <path d="M${x},${y}L${x + w},${y + h}M${x + w},${y}L${x},${y + h}" stroke="#ffffff" stroke-width="5"/>
+      <path d="M${x},${y}L${x + w},${y + h}M${x + w},${y}L${x},${y + h}" stroke="#c8102e" stroke-width="1.6"/>
+      <path d="M${x + w / 2},${y}V${y + h}M${x},${y + h / 2}H${x + w}" stroke="#ffffff" stroke-width="7"/>
+      <path d="M${x + w / 2},${y}V${y + h}M${x},${y + h / 2}H${x + w}" stroke="#c8102e" stroke-width="4"/>`;
+    default: // vn
+      return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="1.5" fill="#da251d"/><polygon points="54,101 56,106.5 62,106.5 57.5,109.5 59.2,115 54,112 48.8,115 50.5,109.5 46,106.5 52,106.5" fill="#ffff00"/>`;
+  }
+}
+
+// Licence plate (rear view) incl. country band and text
+function plateSvg(c, l1, l2) {
+  const eu = { de: 'D', at: 'A', nl: 'NL', fr: 'F', it: 'I', pl: 'PL', se: 'S', hu: 'H', cz: 'CZ' };
+  const yellow = c === 'nl' || c === 'gb';
+  const bg = yellow ? '#f7d117' : '#f0f0f0';
+  const border = c === 'vn' ? '#2233bb' : '#222222';
+  let band = '';
+  if (c === 'vn') {
+    band = `<rect x="236" y="317" width="15" height="24" rx="2" fill="#cc0000"/>
+    <text x="243.5" y="324" font-size="5" fill="white" font-family="Arial" font-weight="bold" text-anchor="middle">VN</text>
+    <text x="243.5" y="335" font-size="8" fill="#FFD700" font-family="Arial" text-anchor="middle">★</text>`;
+  } else if (eu[c]) {
+    const stars = Array.from({ length: 12 }, (_, i) => `<circle cx="${(243.5 + 3.6 * Math.cos(i * Math.PI / 6)).toFixed(2)}" cy="${(323.5 + 3.6 * Math.sin(i * Math.PI / 6)).toFixed(2)}" r="0.55" fill="#FFD700"/>`).join('');
+    band = `<rect x="236" y="317" width="13" height="24" rx="2" fill="#003399"/>${stars}
+    <text x="242.5" y="337.5" font-size="${eu[c].length > 1 ? 5.5 : 7}" fill="white" font-family="Arial" font-weight="bold" text-anchor="middle">${eu[c]}</text>`;
+  } else if (c === 'gb') {
+    band = `<rect x="236" y="317" width="13" height="24" rx="2" fill="#003399"/>
+    <text x="242.5" y="332" font-size="5.5" fill="white" font-family="Arial" font-weight="bold" text-anchor="middle">UK</text>`;
+  }
+  // text centred in the remaining plate area (no band: whole plate)
+  const cx = band ? (c === 'vn' ? 279 : 278) : 271;
+  const font = c === 'vn' ? 'Arial Black' : 'Arial';
+  const text = (l2 ? `
+    <text x="${cx}" y="328" text-anchor="middle" font-size="9.5" fill="#111" font-family="${font}" font-weight="900" letter-spacing="1">${l1}</text>
+    <text x="${cx}" y="338" text-anchor="middle" font-size="9.5" fill="#111" font-family="${font}" font-weight="900" letter-spacing="0.5">${l2}</text>` : `
+    <text x="${cx}" y="333" text-anchor="middle" font-size="${Math.min(10.5, (band ? 50 : 62) / (String(l1).length * 0.66)).toFixed(1)}" fill="#111" font-family="${font}" font-weight="700" letter-spacing="0.3">${l1}</text>`);
+  return `<rect x="233" y="314" width="76" height="30" rx="3" fill="#181820" stroke="#777" stroke-width="0.8"/>
+    <rect x="236" y="317" width="70" height="24" rx="2" fill="${bg}" stroke="${border}" stroke-width="${c === 'vn' ? 1.4 : 0.9}"/>
+    ${band}${text}`;
+}
+
+// Rear logo centred on cx,cy
+function carLogoSvg(brand, cx, cy) {
+  const chrome = '#c8c8cc';
+  switch (brand) {
+    case 'none': return '';
+    case 'seat': // stylised angular "S"
+      return `<circle cx="${cx}" cy="${cy}" r="12" fill="#1a1a20" stroke="${chrome}" stroke-width="1"/>
+      <path d="M${cx + 6.5},${cy - 6.5} L${cx - 4.5},${cy - 6.5} L${cx - 6.5},${cy - 1.2} L${cx + 6.5},${cy + 1.2} L${cx + 4.5},${cy + 6.5} L${cx - 6.5},${cy + 6.5}"
+        fill="none" stroke="${chrome}" stroke-width="2.6" stroke-linejoin="miter" stroke-linecap="square"/>`;
+    case 'vw':
+      return `<circle cx="${cx}" cy="${cy}" r="12" fill="#1a3a70" stroke="${chrome}" stroke-width="1.6"/>
+      <path d="M${cx - 5},${cy - 8} L${cx},${cy - 0.5} L${cx + 5},${cy - 8}" fill="none" stroke="${chrome}" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M${cx - 9},${cy - 3} L${cx - 4.5},${cy + 8} L${cx},${cy + 1.5} L${cx + 4.5},${cy + 8} L${cx + 9},${cy - 3}" fill="none" stroke="${chrome}" stroke-width="1.6" stroke-linejoin="round"/>`;
+    default: // toyota: interlocked 3-oval design
+      return `<circle cx="${cx}" cy="${cy}" r="14" fill="#1a1a20" stroke="#c0b898" stroke-width="1.5"/>
+      <ellipse cx="${cx}" cy="${cy}" rx="11" ry="7.5" fill="none" stroke="#c0b898" stroke-width="1.6"/>
+      <ellipse cx="${cx - 3}" cy="${cy}" rx="4.8" ry="7" fill="none" stroke="#c0b898" stroke-width="1.6"/>
+      <ellipse cx="${cx + 3}" cy="${cy}" rx="4.8" ry="7" fill="none" stroke="#c0b898" stroke-width="1.6"/>
+      <line x1="${cx - 11}" y1="${cy - 7}" x2="${cx + 11}" y2="${cy - 7}" stroke="#c0b898" stroke-width="1.8" stroke-linecap="round"/>`;
+  }
+}
+
+// Garage house colour themes (shutter style)
+const HOUSE_THEMES = {
+  beige: {
+    wall: '#cfc4ae', wallTop: '#d4c9b4', band: '#b8ad98', balcony: '#c8bda8', rail: '#9a9080',
+    roof: ['#d0cec8', '#c2c0ba', '#d8d6d0', '#e8e4dc'], eave: '#e0ddd6', eaveLine: '#c8c4bc', gutter: '#b8b4ac', gable: '#dedad4',
+    louver: ['#b8bec8', '#8a9aaa', '#ccd2da'], frame: ['#5a6068', '#4a5058', '#3a4048'],
+    slat: (i) => { const l = 185 + i * 2; return `rgb(${l},${l - 8},${l - 22})`; }, slatLine: '#aea496', vent: '#8a8070',
+    door: ['#cec4ae', '#d8ceb8', '#aaa090', '#3a4858', '#888078'], lamp: ['#2a3240', '#3a4250', '#1e2838', '#2e3848'],
+  },
+  dark: {
+    wall: '#3a3f44', wallTop: '#41464b', band: '#2c3035', balcony: '#363b40', rail: '#24282c',
+    roof: ['#2a2d31', '#222529', '#30343a', '#3d4248'], eave: '#353a40', eaveLine: '#25292d', gutter: '#1e2125', gable: '#33383e',
+    louver: ['#2c3136', '#22262a', '#3a4046'], frame: ['#1f2327', '#181b1e', '#121416'],
+    slat: (i) => { const l = 52 + i * 2; return `rgb(${l},${l + 4},${l + 9})`; }, slatLine: '#2a2e33', vent: '#1a1d20',
+    door: ['#3a3f44', '#2f3439', '#24282c', '#1a2430', '#9aa3a9'], lamp: ['#1a1d21', '#30353a', '#15181b', '#2a2e33'],
+    cassette: true,
+  },
+  white: {
+    wall: '#e4e8ea', wallTop: '#eef1f3', band: '#cfd5d9', balcony: '#dde2e5', rail: '#9aa3a9',
+    roof: ['#5b6168', '#4f555b', '#666c73', '#7a8087'], eave: '#eceff1', eaveLine: '#b0b8be', gutter: '#9aa3a9', gable: '#e4e8ea',
+    louver: ['#c8cfd4', '#aab3ba', '#dfe4e7'], frame: ['#8a9299', '#7a828a', '#6a7178'],
+    slat: (i) => { const l = 200 + i * 2; return `rgb(${l},${l + 4},${l + 7})`; }, slatLine: '#aab3ba', vent: '#8a949b',
+    door: ['#dfe3e6', '#eef1f3', '#b0b8be', '#4a5866', '#8a949b'], lamp: ['#e8ecef', '#b0b8be', '#d0d6da', '#a0a8ae'],
+  },
+  brick: {
+    brick: true, flatRoof: true, archDoor: true, noBalcony: true, cassette: true,
+    wall: '#c47a3c', mortar: '#dcae7c', plinth: '#3c2a24', plinthMortar: '#5c4840',
+    roof: ['#3e4348'], gutter: '#2a2d31', frame: ['#1c1e21', '#16181a', '#101113'],
+    slat: () => '#202326', slatLine: '#2c3034', vent: '#15171a',
+    lamp: ['#f2f2f0', '#cfcfcb', '#e6e6e2', '#bdbdb8'],
+  },
+};
+function houseTheme(name) {
+  const alias = { anthrazit: 'dark', weiss: 'white', klinker: 'brick' };
+  return HOUSE_THEMES[alias[name] || name] || HOUSE_THEMES.beige;
+}
+
+// Lighten (f > 0) or darken (f < 0) a #rrggbb colour
+function shadeHex(hex, f) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex || '');
+  if (!m) return hex;
+  const n = parseInt(m[1], 16);
+  const ch = (v) => Math.max(0, Math.min(255, Math.round(f >= 0 ? v + (255 - v) * f : v * (1 + f))));
+  return '#' + [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => ch(v).toString(16).padStart(2, '0')).join('');
+}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function sv(hass, e) { return hass?.states?.[e]?.state || ''; }
@@ -798,6 +1014,7 @@ class GateCard extends HTMLElement {
 @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;700&display=swap');
 :host{display:block;}*{box-sizing:border-box;}
 .card{
+  container-type:inline-size;container-name:gatecard;
   background:${bg};
   backdrop-filter:blur(${cfg.backdrop_blur ?? 12}px);-webkit-backdrop-filter:blur(${cfg.backdrop_blur ?? 12}px);
   border-radius:22px;border:1px solid rgba(0,255,255,0.3);
@@ -806,6 +1023,7 @@ class GateCard extends HTMLElement {
   min-height:290px;max-height:${cfg.gate_style === 'shutter' ? 370 : 340}px;
   display:flex;flex-direction:column;
 }
+.card[data-extras]{max-height:${(cfg.gate_style === 'shutter' ? 370 : 340) + 80}px;}
 .card[data-cover-back]{background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border-color:rgba(0,255,255,0.18);}
 .card[data-cover-back]::before{display:none;}
 .card::before{content:"";position:absolute;inset:0;
@@ -837,6 +1055,21 @@ class GateCard extends HTMLElement {
   gap:6px;backdrop-filter:blur(4px);flex-shrink:0;white-space:nowrap;overflow:hidden;}
 .sensor-item{display:flex;align-items:center;gap:3px;flex:1;min-width:0;overflow:hidden;}
 .sdiv{width:1px;height:16px;background:rgba(255,255,255,.2);flex-shrink:0;}
+.sensor-row.has-extras{cursor:pointer;}
+.extras-arrow{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:22px;height:18px;border-radius:9px;
+  border:1px solid var(--gc-accent);background:color-mix(in srgb, var(--gc-accent) 18%, transparent);color:var(--gc-accent);
+  box-shadow:0 0 6px color-mix(in srgb, var(--gc-accent) 35%, transparent);margin-left:2px;}
+.extras-arrow svg{transition:transform .2s;}
+.extras-arrow.open svg{transform:rotate(180deg);}
+.extras{display:none;flex-direction:column;gap:6px;padding:6px 10px 8px;background:rgba(0,0,0,.35);
+  border-top:1px solid rgba(0,255,255,.1);flex-shrink:0;}
+.extras.open{display:flex;}
+.extras-row{display:flex;gap:6px;}
+.ex-chip{flex:1;min-width:0;display:flex;align-items:center;gap:5px;padding:5px 8px;border-radius:8px;
+  background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.18);font-family:monospace;font-size:10px;
+  color:rgba(255,255,255,.7);white-space:nowrap;overflow:hidden;}
+.ex-chip.btn{cursor:pointer;}
+.ex-chip .ex-v{overflow:hidden;text-overflow:ellipsis;margin-left:auto;}
 .flip-btn{display:flex;align-items:center;justify-content:center;
   background:rgba(0,0,0,.35);border-top:1px solid rgba(0,255,255,.2);
   cursor:pointer;backdrop-filter:blur(4px);flex-shrink:0;user-select:none;}
@@ -857,6 +1090,15 @@ class GateCard extends HTMLElement {
   border:1px solid rgba(255,255,255,.15);background:rgba(0,0,0,.25);
   transition:opacity .4s,background .2s;padding:0;}
 .ctrl-btn:active{filter:brightness(1.3);}
+.ctrl-btn{min-width:0;}
+.ctrl-btn > div{min-width:0;max-width:100%;}
+.ctrl-btn .bl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+/* narrow cards (phones): icon above label so all four buttons fit */
+@container gatecard (max-width: 460px) {
+  .ctrl-btn > div{flex-direction:column;gap:1px !important;padding:0 2px !important;}
+  .ctrl-btn .bl{font-size:9.5px !important;letter-spacing:0.3px !important;}
+  .f-title{font-size:15px !important;letter-spacing:0.5px !important;}
+}
 .prog-track{width:100%;height:5px;border-radius:3px;
   background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);overflow:hidden;margin-top:4px;}
 .prog-fill{height:100%;border-radius:3px;box-shadow:0 0 6px rgba(0,255,200,.6);transition:width .5s linear;}
@@ -910,6 +1152,7 @@ class GateCard extends HTMLElement {
       set('f-ltxt',   el => { el.textContent=t.light(lightOn); el.style.color=lightOn?'#ffd740':'rgba(255,255,255,0.7)'; el.style.textShadow=lightOn?'0 0 8px rgba(255,215,64,0.9)':'none'; });
       set('f-mt',     el => { el.textContent=mTime; el.style.color=mColor; el.style.fontWeight=motionOn?'700':'400'; });
       set('f-pt',     el => { el.textContent=pTime; el.style.color=pColor; el.style.fontWeight=personOn?'700':'400'; });
+      this._updateExtras();
 
     } else {
       const { pos, isOpen, isClose, isStop, isMoving, isClosed, statusText, statusColor, subText } = st;
@@ -1039,7 +1282,7 @@ class GateCard extends HTMLElement {
         <div style="display:flex;align-items:center;gap:4px;margin-bottom:7px;">
           <div style="font-size:22px;line-height:1;filter:drop-shadow(0 0 10px rgba(0,0,0,.8));flex-shrink:0;">🚧</div>
           <div style="min-width:0;overflow:hidden;">
-            <div style="font-family:Rajdhani,sans-serif;font-size:18px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:${tc};line-height:1;text-shadow:0 2px 8px rgba(0,0,0,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${cfg.gate_title || t.title}</div>
+            <div class="f-title" style="font-family:Rajdhani,sans-serif;font-size:18px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:${tc};line-height:1;text-shadow:0 2px 8px rgba(0,0,0,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${cfg.gate_title || t.title}</div>
             <div style="font-family:monospace;font-size:9px;letter-spacing:0.8px;color:rgba(255,255,255,.85);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${cfg.gate_zone || t.zone}</div>
           </div>
         </div>
@@ -1071,7 +1314,7 @@ class GateCard extends HTMLElement {
       ${cameraHTML}
     </div>
   </div>
-  <div class="sensor-row">
+  <div class="sensor-row ${this._hasExtras() ? 'has-extras' : ''}" ${this._hasExtras() ? 'data-action="toggle-extras"' : ''}>
     <div class="sensor-item">
       <span style="font-size:12px;flex-shrink:0;">👁️</span>
       <span style="font-family:monospace;font-size:10px;letter-spacing:.5px;color:rgba(255,255,255,.6);white-space:nowrap;">${t.motion}</span>
@@ -1083,11 +1326,60 @@ class GateCard extends HTMLElement {
       <span style="font-family:monospace;font-size:10px;letter-spacing:.5px;color:rgba(255,255,255,.6);white-space:nowrap;">${t.person}</span>
       <span id="f-pt" style="font-family:monospace;font-size:10px;letter-spacing:.5px;color:rgba(255,255,255,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">—</span>
     </div>
+    ${this._hasExtras() ? `<span class="extras-arrow ${this._extrasOpen ? 'open' : ''}" id="f-xarrow" style="--gc-accent:${cfg.accent_color || '#00ffcc'}"><svg viewBox="0 0 10 6" width="10" height="6"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>` : ''}
   </div>
+  ${this._hasExtras() ? this._extrasHTML() : ''}
   <div class="flip-btn" style="height:${btnH}px;" data-action="flip">
     <span style="font-family:monospace;font-size:11px;letter-spacing:4px;color:${accent};text-transform:uppercase;text-shadow:0 0 10px ${accent}99;">${t.control}</span>
   </div>
 </div>`;
+  }
+
+  // ── Camera extras drawer (front face) ──────────────────────────────────────
+  _hasExtras() {
+    const c = this._config;
+    return !!(c.entity_vehicle || c.entity_animal || c.entity_floodlight || c.entity_recording);
+  }
+
+  _extrasHTML() {
+    const c = this._config;
+    const t = this.t;
+    const chip = (id, icon, label, action) => `<div class="ex-chip ${action ? 'btn' : ''}" id="${id}" ${action ? `data-action="${action}"` : ''}>
+      <span style="font-size:12px;">${icon}</span><span>${label}</span><span class="ex-v" id="${id}-v">—</span></div>`;
+    const row1 = [c.entity_vehicle && chip('x-veh', '🚗', t.vehicle || 'Vehicle'), c.entity_animal && chip('x-ani', '🐾', t.animal || 'Animal')].filter(Boolean);
+    const row2 = [c.entity_floodlight && chip('x-flo', '🔦', t.floodlight || 'Floodlight', 'toggle-floodlight'),
+                  c.entity_recording && chip('x-rec', '⏺', t.recording || 'Recording', 'toggle-recording')].filter(Boolean);
+    return `<div class="extras ${this._extrasOpen ? 'open' : ''}" id="f-extras">
+      ${row1.length ? `<div class="extras-row">${row1.join('')}</div>` : ''}
+      ${row2.length ? `<div class="extras-row">${row2.join('')}</div>` : ''}
+    </div>`;
+  }
+
+  _updateExtras() {
+    if (!this._hasExtras()) return;
+    const sr = this.shadowRoot, c = this._config, t = this.t, h = this._hass;
+    const set = (id, fn) => { const el = sr.getElementById(id); if (el) fn(el); };
+    const detect = (id, ent, color) => set(id, (el) => {
+      const on = sv(h, ent) === 'on';
+      el.style.borderColor = on ? color : 'rgba(255,255,255,.18)';
+      el.style.color = on ? color : 'rgba(255,255,255,.7)';
+      set(id + '-v', (v) => { v.textContent = on ? (t.now || 'now') : fmtTime(timeDiff(h, ent), t); v.style.fontWeight = on ? '700' : '400'; });
+    });
+    if (c.entity_vehicle) detect('x-veh', c.entity_vehicle, '#4fc3f7');
+    if (c.entity_animal) detect('x-ani', c.entity_animal, '#a5d6a7');
+    if (c.entity_floodlight) set('x-flo', (el) => {
+      const on = sv(h, c.entity_floodlight) === 'on';
+      const mode = c.entity_floodlight_mode ? sv(h, c.entity_floodlight_mode) : '';
+      el.style.borderColor = on ? 'rgba(255,220,50,.7)' : 'rgba(255,255,255,.18)';
+      el.style.background = on ? 'rgba(255,220,50,.2)' : 'rgba(0,0,0,.3)';
+      const m = mode ? ((t.floodModes || {})[mode] || mode) : '';
+      set('x-flo-v', (v) => { v.textContent = `${on ? (t.on || 'ON') : (t.off || 'OFF')}${m ? ' · ' + m : ''}`; v.style.color = on ? '#ffd740' : 'rgba(255,255,255,.6)'; });
+    });
+    if (c.entity_recording) set('x-rec', (el) => {
+      const on = sv(h, c.entity_recording) === 'on';
+      el.style.borderColor = on ? 'rgba(255,82,82,.7)' : 'rgba(255,255,255,.18)';
+      set('x-rec-v', (v) => { v.textContent = on ? (t.recOn || 'Recording') : (t.recOff || 'Paused'); v.style.color = on ? '#ff6e6e' : 'rgba(255,255,255,.6)'; });
+    });
   }
 
   // ── Back HTML ────────────────────────────────────────────────────────────────
@@ -1271,18 +1563,22 @@ ${lightOn?`<circle cx="459" cy="18" r="18" fill="rgba(255,220,80,0.18)"/><circle
     const visibleTop  = Math.max(OPENING_TOP, doorBottomY);
     const visibleH    = Math.max(0, DOOR_BOTTOM - visibleTop);
 
+    const th = houseTheme(this._config.house_theme);
     let slatsSvg = '';
     for (let i = 0; i < SLAT_COUNT; i++) {
       const baseY = OPENING_TOP + OPENING_H - SLAT_H - (i * SLAT_PITCH);
       const y     = baseY - scrolled;
-      const lum   = 185 + i * 2;
-      const fill  = `rgb(${lum},${lum - 8},${lum - 22})`;
-      slatsSvg += `<rect x="${OPENING_L}" y="${y}" width="${OPENING_W}" height="${SLAT_H}" rx="1" fill="${fill}" stroke="#aea496" stroke-width="0.5"/>`;
+      const fill  = th.slat(i);
+      slatsSvg += `<rect x="${OPENING_L}" y="${y}" width="${OPENING_W}" height="${SLAT_H}" rx="1" fill="${fill}" stroke="${th.slatLine}" stroke-width="0.5"/>`;
+      // sectional door look: recessed cassettes
+      if (th.cassette) {
+        for (let v = 0; v < 6; v++) slatsSvg += `<rect x="${OPENING_L + 6 + v * 51}" y="${y + 1.5}" width="46" height="${SLAT_H - 3}" rx="0.8" fill="rgba(0,0,0,0.18)" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>`;
+      }
       slatsSvg += `<rect x="${OPENING_L + 4}" y="${y + 1}" width="${OPENING_W - 8}" height="3" rx="1" fill="rgba(255,255,255,0.2)"/>`;
       slatsSvg += `<rect x="${OPENING_L + 4}" y="${y + SLAT_H - 3}" width="${OPENING_W - 8}" height="2" rx="1" fill="rgba(0,0,0,0.1)"/>`;
       if (i >= SLAT_COUNT - 3) {
         for (let v = 0; v < 5; v++) {
-          slatsSvg += `<rect x="${OPENING_L + 16 + v * 58}" y="${y + 2.5}" width="40" height="6" rx="1" fill="rgba(0,0,0,0.32)" stroke="#8a8070" stroke-width="0.4"/>`;
+          if (!th.cassette) slatsSvg += `<rect x="${OPENING_L + 16 + v * 58}" y="${y + 2.5}" width="40" height="6" rx="1" fill="rgba(0,0,0,0.32)" stroke="${th.vent}" stroke-width="0.4"/>`;
         }
       }
       if (i === 0) {
@@ -1303,11 +1599,24 @@ ${lightOn?`<circle cx="459" cy="18" r="18" fill="rgba(255,220,80,0.18)"/><circle
 <defs>
   <clipPath id="haDoorOpenClip"><rect x="113" y="${visibleTop}" width="316" height="${visibleH}"/></clipPath>
   <clipPath id="haDoorClip"><rect x="105" y="230" width="330" height="152"/></clipPath>
-  <pattern id="haLouverPat" x="0" y="0" width="28" height="11" patternUnits="userSpaceOnUse">
-    <rect x="0" y="0" width="28" height="11" fill="#b8bec8"/>
-    <rect x="0" y="2" width="28" height="6" rx="1" fill="#8a9aaa" stroke="#7a8898" stroke-width="0.5"/>
-    <rect x="0" y="0" width="28" height="1.5" fill="#ccd2da"/>
+  ${th.louver ? `<pattern id="haLouverPat" x="0" y="0" width="28" height="11" patternUnits="userSpaceOnUse">
+    <rect x="0" y="0" width="28" height="11" fill="${th.louver[0]}"/>
+    <rect x="0" y="2" width="28" height="6" rx="1" fill="${th.louver[1]}" stroke="rgba(0,0,0,0.15)" stroke-width="0.5"/>
+    <rect x="0" y="0" width="28" height="1.5" fill="${th.louver[2]}"/>
+  </pattern>` : ''}
+  ${th.brick ? `<pattern id="haBrick" x="0" y="0" width="16" height="8" patternUnits="userSpaceOnUse">
+    <rect width="16" height="8" fill="${th.wall}"/>
+    <path d="M0,3.6H16M0,7.6H16M8,0V3.6M0,4V7.6M16,4V7.6" stroke="${th.mortar}" stroke-width="0.8"/>
   </pattern>
+  <pattern id="haPlinth" x="0" y="0" width="16" height="8" patternUnits="userSpaceOnUse">
+    <rect width="16" height="8" fill="${th.plinth}"/>
+    <path d="M0,3.6H16M0,7.6H16M8,0V3.6M0,4V7.6M16,4V7.6" stroke="${th.plinthMortar}" stroke-width="0.8"/>
+  </pattern>
+  <pattern id="haTiles" x="0" y="0" width="10" height="6" patternUnits="userSpaceOnUse">
+    <rect width="10" height="6" fill="${th.roof[0]}"/>
+    <path d="M0,6 Q5,2 10,6" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="0.8"/>
+    <path d="M0,0.5H10" stroke="rgba(255,255,255,0.06)" stroke-width="0.8"/>
+  </pattern>` : ''}
   <clipPath id="haGableClip"><polygon points="252,162 408,162 330,78"/></clipPath>
   <radialGradient id="haGlow" cx="50%" cy="50%" r="50%">
     <stop offset="0%" stop-color="#fff8c0" stop-opacity="1"/>
@@ -1315,10 +1624,10 @@ ${lightOn?`<circle cx="459" cy="18" r="18" fill="rgba(255,220,80,0.18)"/><circle
     <stop offset="100%" stop-color="#ffaa00" stop-opacity="0"/>
   </radialGradient>
   <linearGradient id="haCarBody" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0%" stop-color="#d4c9a8"/><stop offset="50%" stop-color="#c8bc98"/><stop offset="100%" stop-color="#a89878"/>
+    <stop offset="0%" stop-color="${shadeHex(this._config.car_color || '#c8bc98', 0.12)}"/><stop offset="50%" stop-color="${this._config.car_color || '#c8bc98'}"/><stop offset="100%" stop-color="${shadeHex(this._config.car_color || '#c8bc98', -0.16)}"/>
   </linearGradient>
   <linearGradient id="haCarRoof" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0%" stop-color="#b8ae90"/><stop offset="100%" stop-color="#9a9070"/>
+    <stop offset="0%" stop-color="${shadeHex(this._config.car_color || '#c8bc98', -0.08)}"/><stop offset="100%" stop-color="${shadeHex(this._config.car_color || '#c8bc98', -0.23)}"/>
   </linearGradient>
   <linearGradient id="haRearWin" x1="0" y1="0" x2="0" y2="1">
     <stop offset="0%" stop-color="#1a2838"/><stop offset="100%" stop-color="#0a1420"/>
@@ -1329,49 +1638,56 @@ ${lightOn?`<circle cx="459" cy="18" r="18" fill="rgba(255,220,80,0.18)"/><circle
 <rect x="26" y="282" width="12" height="16" rx="2" fill="#8a9098"/>
 <rect x="29" y="96" width="4" height="188" fill="#c8d0d8"/>
 <circle cx="31" cy="94" r="4" fill="#d8c060"/>
-<rect x="33" y="96" width="42" height="25" rx="1.5" fill="#da251d"/>
-<polygon points="54,101 56,106.5 62,106.5 57.5,109.5 59.2,115 54,112 48.8,115 50.5,109.5 46,106.5 52,106.5" fill="#ffff00"/>
-<!-- WALLS -->
-<rect x="85" y="248" width="490" height="124" fill="#cfc4ae"/>
-<rect x="85" y="162" width="490" height="90" fill="#d4c9b4"/>
-<rect x="85" y="246" width="490" height="5" fill="#b8ad98"/>
+${flagSvg(this._config.country || 'vn', 33, 96, 42, 25)}
+<!-- WALLS (house_theme) -->
+${th.brick ? `<rect x="85" y="160" width="490" height="212" fill="url(#haBrick)"/>
+<rect x="85" y="344" width="490" height="28" fill="url(#haPlinth)"/>
+<rect x="85" y="343" width="490" height="1.5" fill="rgba(0,0,0,0.25)"/>` : `<rect x="85" y="248" width="490" height="124" fill="${th.wall}"/>
+<rect x="85" y="162" width="490" height="90" fill="${th.wallTop}"/>
+<rect x="85" y="246" width="490" height="5" fill="${th.band}"/>
 <rect x="85" y="182" width="490" height="1.5" fill="rgba(0,0,0,0.07)"/>
 <rect x="85" y="202" width="490" height="1.5" fill="rgba(0,0,0,0.07)"/>
-<rect x="85" y="222" width="490" height="1.5" fill="rgba(0,0,0,0.05)"/>
-<!-- Balcony -->
-<rect x="455" y="168" width="118" height="80" fill="#c8bda8"/>
-<rect x="455" y="240" width="118" height="5" rx="1" fill="#9a9080"/>
-<rect x="455" y="168" width="118" height="5" rx="1" fill="#9a9080"/>
-<line x1="470" y1="173" x2="470" y2="245" stroke="#9a9080" stroke-width="1.5"/>
-<line x1="486" y1="173" x2="486" y2="245" stroke="#9a9080" stroke-width="1.5"/>
-<line x1="502" y1="173" x2="502" y2="245" stroke="#9a9080" stroke-width="1.5"/>
-<line x1="518" y1="173" x2="518" y2="245" stroke="#9a9080" stroke-width="1.5"/>
-<line x1="534" y1="173" x2="534" y2="245" stroke="#9a9080" stroke-width="1.5"/>
-<line x1="550" y1="173" x2="550" y2="245" stroke="#9a9080" stroke-width="1.5"/>
-<!-- ROOF -->
-<polygon points="72,162 330,60 588,162" fill="#d0cec8"/>
-<polygon points="72,162 330,60 330,162" fill="#c2c0ba"/>
-<polygon points="330,60 588,162 330,162" fill="#d8d6d0"/>
-<polygon points="72,162 330,60 588,162 575,162 330,68 85,162" fill="#e8e4dc"/>
-<rect x="72" y="160" width="516" height="7" fill="#e0ddd6" stroke="#c8c4bc" stroke-width="0.5"/>
-<rect x="72" y="165" width="516" height="5" rx="2" fill="#b8b4ac" stroke="#a8a49c" stroke-width="0.6"/>
-<line x1="72" y1="162" x2="330" y2="60" stroke="#b8b4ac" stroke-width="2.5"/>
-<line x1="330" y1="60" x2="588" y2="162" stroke="#c8c4bc" stroke-width="2.5"/>
-<polygon points="252,162 408,162 330,78" fill="#dedad4" stroke="#c0bcb4" stroke-width="1.5"/>
+<rect x="85" y="222" width="490" height="1.5" fill="rgba(0,0,0,0.05)"/>`}
+${th.noBalcony ? '' : `<!-- Balcony -->
+<rect x="455" y="168" width="118" height="80" fill="${th.balcony}"/>
+<rect x="455" y="240" width="118" height="5" rx="1" fill="${th.rail}"/>
+<rect x="455" y="168" width="118" height="5" rx="1" fill="${th.rail}"/>
+<line x1="470" y1="173" x2="470" y2="245" stroke="${th.rail}" stroke-width="1.5"/>
+<line x1="486" y1="173" x2="486" y2="245" stroke="${th.rail}" stroke-width="1.5"/>
+<line x1="502" y1="173" x2="502" y2="245" stroke="${th.rail}" stroke-width="1.5"/>
+<line x1="518" y1="173" x2="518" y2="245" stroke="${th.rail}" stroke-width="1.5"/>
+<line x1="534" y1="173" x2="534" y2="245" stroke="${th.rail}" stroke-width="1.5"/>
+<line x1="550" y1="173" x2="550" y2="245" stroke="${th.rail}" stroke-width="1.5"/>`}
+${th.flatRoof ? `<!-- FLAT ROOF with tiled fascia (brick theme) -->
+<rect x="72" y="142" width="516" height="22" fill="url(#haTiles)"/>
+<rect x="72" y="141" width="516" height="2.5" fill="${th.gutter}"/>
+<rect x="72" y="163" width="516" height="4" fill="${th.gutter}"/>
+` : `<!-- ROOF -->
+<polygon points="72,162 330,60 588,162" fill="${th.roof[0]}"/>
+<polygon points="72,162 330,60 330,162" fill="${th.roof[1]}"/>
+<polygon points="330,60 588,162 330,162" fill="${th.roof[2]}"/>
+<polygon points="72,162 330,60 588,162 575,162 330,68 85,162" fill="${th.roof[3]}"/>
+<rect x="72" y="160" width="516" height="7" fill="${th.eave}" stroke="${th.eaveLine}" stroke-width="0.5"/>
+<rect x="72" y="165" width="516" height="5" rx="2" fill="${th.gutter}" stroke="${th.gutter}" stroke-width="0.6"/>
+<line x1="72" y1="162" x2="330" y2="60" stroke="${th.gutter}" stroke-width="2.5"/>
+<line x1="330" y1="60" x2="588" y2="162" stroke="${th.eaveLine}" stroke-width="2.5"/>
+<polygon points="252,162 408,162 330,78" fill="${th.gable}" stroke="${th.eaveLine}" stroke-width="1.5"/>
 <g clip-path="url(#haGableClip)"><rect x="252" y="78" width="156" height="84" fill="url(#haLouverPat)"/></g>
-<line x1="260" y1="162" x2="330" y2="86" stroke="#c8c4bc" stroke-width="1.2"/>
-<line x1="400" y1="162" x2="330" y2="86" stroke="#c8c4bc" stroke-width="1.2"/>
-<polygon points="321,86 339,86 343,97 330,105 317,97" fill="#d0ccc4" stroke="#b8b4ac" stroke-width="1"/>
+<line x1="260" y1="162" x2="330" y2="86" stroke="${th.eaveLine}" stroke-width="1.2"/>
+<line x1="400" y1="162" x2="330" y2="86" stroke="${th.eaveLine}" stroke-width="1.2"/>
+<polygon points="321,86 339,86 343,97 330,105 317,97" fill="${th.gable}" stroke="${th.gutter}" stroke-width="1"/>`}
+<!-- garage door group (moves right when the side door is on the left) -->
+<g transform="translate(${this._config.side_door === 'left' ? 72 : this._config.side_door === 'none' ? 59 : 0},0)">
 <!-- MOTOR BOX -->
 <rect x="103" y="212" width="336" height="18" rx="4" fill="#1e2a38" stroke="#2e3a50" stroke-width="0.8"/>
 <rect x="107" y="215" width="328" height="12" rx="2" fill="rgba(0,0,0,0.45)"/>
 <text x="116" y="225" font-size="8" fill="#5a9adf" font-family="monospace" letter-spacing="2.5" font-weight="bold">${(this._config.home_name || 'MY HOME').toUpperCase().substring(0,28)}</text>
 ${motorDot}${arrowUp}${arrowDown}
 <!-- GARAGE DOOR FRAME -->
-<rect x="103" y="228" width="336" height="144" rx="2" fill="#5a6068"/>
-<rect x="103" y="228" width="10" height="144" fill="#4a5058"/>
-<rect x="429" y="228" width="10" height="144" fill="#4a5058"/>
-<rect x="103" y="369" width="336" height="6" rx="1" fill="#3a4048"/>
+<rect x="103" y="228" width="336" height="144" rx="2" fill="${th.frame[0]}"/>
+<rect x="103" y="228" width="10" height="144" fill="${th.frame[1]}"/>
+<rect x="429" y="228" width="10" height="144" fill="${th.frame[1]}"/>
+<rect x="103" y="369" width="336" height="6" rx="1" fill="${th.frame[2]}"/>
 <!-- INTERIOR + CAR (clipped by shutter opening) -->
 <g clip-path="url(#haDoorOpenClip)">
   <rect x="113" y="230" width="316" height="140" fill="#1a1e24"/>
@@ -1415,7 +1731,7 @@ ${motorDot}${arrowUp}${arrowDown}
     <!-- Body highlight -->
     <path d="M176,264 Q175,288 175,318 L367,318 Q367,288 367,264 Z" fill="rgba(255,255,255,0.07)"/>
     <!-- Boot / trunk lid -->
-    <path d="M178,250 Q180,241 271,235 Q362,241 364,250 L366,268 Q330,263 271,261 Q212,263 176,268 Z" fill="url(#haCarBody)" stroke="#b0a888" stroke-width="0.5"/>
+    <path d="M178,250 Q180,241 271,235 Q362,241 364,250 L366,268 Q330,263 271,261 Q212,263 176,268 Z" fill="url(#haCarBody)" stroke="${shadeHex(this._config.car_color || '#c8bc98', -0.1)}" stroke-width="0.5"/>
     <!-- Trunk highlight -->
     <path d="M194,247 Q240,240 271,238 Q302,240 348,247" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="1.8"/>
     <!-- Rear window -->
@@ -1423,7 +1739,7 @@ ${motorDot}${arrowUp}${arrowDown}
     <!-- Rear window wiper -->
     <line x1="224" y1="248" x2="318" y2="242" stroke="#444" stroke-width="1.5" stroke-linecap="round"/>
     <!-- Roof spoiler strip -->
-    <path d="M210,250 Q271,241 332,250 L329,246 Q271,237 213,246 Z" fill="#a09060" stroke="#887848" stroke-width="0.5"/>
+    <path d="M210,250 Q271,241 332,250 L329,246 Q271,237 213,246 Z" fill="${shadeHex(this._config.car_color || '#c8bc98', -0.3)}" stroke="${shadeHex(this._config.car_color || '#c8bc98', -0.4)}" stroke-width="0.5"/>
     <!-- Roof -->
     <path d="M174,250 L196,250 Q215,224 271,218 Q327,224 346,250 L368,250 L365,262 Q330,255 271,253 Q212,255 177,262 Z" fill="url(#haCarRoof)"/>
     <!-- LEFT tail light full assembly -->
@@ -1449,26 +1765,20 @@ ${motorDot}${arrowUp}${arrowDown}
     <rect x="180" y="295" width="182" height="3" rx="1" fill="#ff4444" opacity="0.6"/>
     <!-- Body crease line -->
     <rect x="180" y="262" width="182" height="2.5" rx="1" fill="#c8c4a8" opacity="0.65"/>
-    <!-- TOYOTA LOGO — correct interlocked 3-oval design -->
-    <circle cx="271" cy="272" r="14" fill="#1a1a20" stroke="#c0b898" stroke-width="1.5"/>
-    <!-- outer horizontal big oval -->
-    <ellipse cx="271" cy="272" rx="11" ry="7.5" fill="none" stroke="#c0b898" stroke-width="1.6"/>
-    <!-- left inner vertical oval -->
-    <ellipse cx="268" cy="272" rx="4.8" ry="7" fill="none" stroke="#c0b898" stroke-width="1.6"/>
-    <!-- right inner vertical oval -->
-    <ellipse cx="274" cy="272" rx="4.8" ry="7" fill="none" stroke="#c0b898" stroke-width="1.6"/>
-    <!-- center horizontal line (crossbar of T) -->
-    <line x1="260" y1="265" x2="282" y2="265" stroke="#c0b898" stroke-width="1.8" stroke-linecap="round"/>
-    <!-- VIOS badge -->
-    <text x="220" y="275" font-size="10.5" fill="#d8d8d8" font-family="Arial" font-weight="bold" letter-spacing="2" text-anchor="end" stroke="#666" stroke-width="0.6" paint-order="stroke">VIOS</text>
-    <!-- LICENSE PLATE -->
-    <rect x="233" y="314" width="76" height="30" rx="3" fill="#181820" stroke="#777" stroke-width="0.8"/>
-    <rect x="236" y="317" width="70" height="24" rx="2" fill="#f0f0f0" stroke="#2233bb" stroke-width="1.4"/>
-    <rect x="236" y="317" width="15" height="24" rx="2" fill="#cc0000"/>
-    <text x="243.5" y="324" font-size="5" fill="white" font-family="Arial" font-weight="bold" text-anchor="middle">VN</text>
-    <text x="243.5" y="335" font-size="8" fill="#FFD700" font-family="Arial" text-anchor="middle">★</text>
-    <text x="279" y="328" text-anchor="middle" font-size="9.5" fill="#111" font-family="Arial Black" font-weight="900" letter-spacing="1">${this._config.plate_line1||'99A'}</text>
-    <text x="279" y="338" text-anchor="middle" font-size="9.5" fill="#111" font-family="Arial Black" font-weight="900" letter-spacing="0.5">${this._config.plate_line2||'873.76'}</text>
+    <!-- REAR LOGO (car_brand) -->
+    ${carLogoSvg(this._config.car_brand || 'toyota', 271, 272)}
+    <!-- MODEL BADGE (car_model) -->
+    ${(() => { const m = String(this._config.car_model ?? 'VIOS'); if (!m) return '';
+      // SEAT puts the model name centred below the logo; others on the left of the boot lid
+      if ((this._config.car_brand || 'toyota') === 'seat') {
+        return `<text x="271" y="292" font-size="7.5" fill="#d8d8d8" font-family="Arial" font-style="italic" font-weight="bold" letter-spacing="0.6" text-anchor="middle" stroke="#666" stroke-width="0.4" paint-order="stroke">${m}</text>`;
+      }
+      const fs = m.length > 5 ? Math.max(6.5, 10.5 * 5 / m.length) : 10.5;  // long names get smaller to stay on the boot lid
+      return `<text x="222" y="275" font-size="${fs.toFixed(1)}" fill="#d8d8d8" font-family="Arial" font-weight="bold" letter-spacing="${m.length > 5 ? 1 : 2}" text-anchor="end" stroke="#666" stroke-width="0.6" paint-order="stroke">${m}</text>`; })()}
+    <!-- TRIM BADGE (car_trim), right side of the boot lid -->
+    ${this._config.car_trim ? `<text x="320" y="276" font-size="10" fill="#e0e0e0" font-family="Arial Black,Arial" font-weight="900" font-style="italic" letter-spacing="0.5" text-anchor="start" stroke="#555" stroke-width="0.5" paint-order="stroke">${String(this._config.car_trim).substring(0, 8)}</text>` : ''}
+    <!-- LICENSE PLATE (country) -->
+    ${(() => { const c = this._config.country || 'vn'; return plateSvg(c, this._config.plate_line1 || (c === 'vn' ? '99A' : ''), this._config.plate_line2 || (c === 'vn' ? '873.76' : '')); })()}
     <circle cx="239" cy="319" r="1.2" fill="#aaa"/>
     <circle cx="304" cy="319" r="1.2" fill="#aaa"/>
     <circle cx="239" cy="339" r="1.2" fill="#aaa"/>
@@ -1484,22 +1794,35 @@ ${motorDot}${arrowUp}${arrowDown}
 </g>
 <!-- SHUTTER SLATS -->
 <g clip-path="url(#haDoorClip)">${slatsSvg}</g>
-<!-- PEDESTRIAN DOOR -->
-<rect x="442" y="252" width="72" height="120" rx="3" fill="#cec4ae"/>
-<rect x="444" y="254" width="68" height="116" rx="2" fill="#d8ceb8" stroke="#aaa090" stroke-width="1.2"/>
-<rect x="458" y="264" width="12" height="96" rx="2" fill="#3a4858"/>
-<rect x="474" y="264" width="12" height="96" rx="2" fill="#3a4858"/>
-<rect x="490" y="264" width="12" height="96" rx="2" fill="#3a4858"/>
-<rect x="448" y="304" width="7" height="18" rx="3" fill="#888078"/>
+</g>
+<!-- PEDESTRIAN DOOR (house_theme, side_door) -->
+<g transform="translate(${this._config.side_door === 'left' ? -345 : 0},0)" ${this._config.side_door === 'none' ? 'display="none"' : ''}>
+${th.archDoor ? `<path d="M446,372 V282 A32,32 0 0 1 510,282 V372 Z" fill="#141516" stroke="${th.mortar}" stroke-width="3"/>
+<g fill="none" stroke="#f0f0ee" stroke-width="1.3">
+  <path d="M449,372 V283 A29,29 0 0 1 507,283 V372"/>
+  <path d="M478,256 V372 M449,300 H507 M449,336 H507"/>
+  <circle cx="463.5" cy="318" r="7"/><circle cx="492.5" cy="318" r="7"/>
+  <circle cx="463.5" cy="354" r="7"/><circle cx="492.5" cy="354" r="7"/>
+  <path d="M458,284 q5,-12 20,-12 q15,0 20,12"/>
+  <path d="M466,292 q4,-8 12,-8 q8,0 12,8"/>
+</g>` : `<rect x="442" y="252" width="72" height="120" rx="3" fill="${th.door[0]}"/>
+<rect x="444" y="254" width="68" height="116" rx="2" fill="${th.door[1]}" stroke="${th.door[2]}" stroke-width="1.2"/>
+<rect x="458" y="264" width="12" height="96" rx="2" fill="${th.door[3]}"/>
+<rect x="474" y="264" width="12" height="96" rx="2" fill="${th.door[3]}"/>
+<rect x="490" y="264" width="12" height="96" rx="2" fill="${th.door[3]}"/>
+<rect x="448" y="304" width="7" height="18" rx="3" fill="${th.door[4]}"/>`}
+</g>
 <!-- WALL LAMPS -->
-<rect x="113" y="230" width="18" height="28" rx="3" fill="#2a3240" stroke="#3a4250" stroke-width="0.8"/>
-<polygon points="113,242 131,242 128,258 116,258" fill="#1e2838" stroke="#2e3848" stroke-width="0.7"/>
+<g transform="translate(${this._config.side_door === 'left' ? 72 : this._config.side_door === 'none' ? 59 : 0},0)">
+<rect x="113" y="230" width="18" height="28" rx="3" fill="${th.lamp[0]}" stroke="${th.lamp[1]}" stroke-width="0.8"/>
+<polygon points="113,242 131,242 128,258 116,258" fill="${th.lamp[2]}" stroke="${th.lamp[3]}" stroke-width="0.7"/>
 <rect x="115" y="243" width="12" height="10" rx="1" fill="${glassFill}"/>
 <ellipse cx="122" cy="248" rx="4" ry="3" fill="${bulbFill}"/>
-<rect x="411" y="230" width="18" height="28" rx="3" fill="#2a3240" stroke="#3a4250" stroke-width="0.8"/>
-<polygon points="411,242 429,242 426,258 414,258" fill="#1e2838" stroke="#2e3848" stroke-width="0.7"/>
+<rect x="411" y="230" width="18" height="28" rx="3" fill="${th.lamp[0]}" stroke="${th.lamp[1]}" stroke-width="0.8"/>
+<polygon points="411,242 429,242 426,258 414,258" fill="${th.lamp[2]}" stroke="${th.lamp[3]}" stroke-width="0.7"/>
 <rect x="413" y="243" width="12" height="10" rx="1" fill="${glassFill}"/>
 <ellipse cx="420" cy="248" rx="4" ry="3" fill="${bulbFill}"/>
+</g>
 <!-- LOCK BUTTON — right wall beside pedestrian door -->
 ${this._config.entity_gate_lock ? (() => {
   // ON = locked (green, shackle down), OFF = unlocked (red, shackle up)
@@ -1896,6 +2219,15 @@ ${rp.svg}
         return;
       }
 
+      if (action === 'toggle-extras') {
+        this._extrasOpen = !this._extrasOpen;
+        const sr = this.shadowRoot;
+        sr.getElementById('f-extras')?.classList.toggle('open', this._extrasOpen);
+        sr.getElementById('f-xarrow')?.classList.toggle('open', this._extrasOpen);
+        sr.querySelector('.card')?.toggleAttribute('data-extras', this._extrasOpen);
+        return;
+      }
+
       if (action === 'open-camera') {
         // Fire the same event picture-entity fires — opens HA more-info camera dialog
         this.dispatchEvent(new CustomEvent('hass-more-info', {
@@ -1912,6 +2244,8 @@ ${rp.svg}
         'open-gate':    cfg.entity_gate_open,
         'stop-gate':    cfg.entity_gate_stop,
         'close-gate':   cfg.entity_gate_close,
+        'toggle-floodlight': cfg.entity_floodlight,
+        'toggle-recording':  cfg.entity_recording,
       };
 
       // Block open-gate when use_lock is enabled and lock entity is ON
@@ -2232,7 +2566,45 @@ class GateCardEditor extends HTMLElement {
       <div class="row">
         <label>${t.edPlate2}</label>
         <input class="txt-inp" type="text" id="inp-plate-line2"
-          placeholder="873.76" maxlength="10" value="${cfg.plate_line2||'873.76'}"/>
+          placeholder="873.76" maxlength="10" value="${cfg.plate_line2||''}"/>
+      </div>
+      <div class="row">
+        <label>${t.edCountry||'🌍 Country'}</label>
+        <select class="txt-inp" id="inp-country">
+          ${Object.entries(COUNTRIES).map(([k, n]) => `<option value="${k}" ${(cfg.country||'vn')===k?'selected':''}>${n}</option>`).join('')}
+        </select>
+      </div>
+      <div class="row">
+        <label>${t.edHouseTheme||'🏠 House style'}</label>
+        <select class="txt-inp" id="inp-house-theme">
+          ${['beige', 'dark', 'white', 'brick'].map((k) => `<option value="${k}" ${(houseTheme(cfg.house_theme) === HOUSE_THEMES[k])?'selected':''}>${(t.houseThemes||{})[k]||k}</option>`).join('')}
+        </select>
+      </div>
+      <div class="row">
+        <label>${t.edSideDoor||'🚪 Side door'}</label>
+        <select class="txt-inp" id="inp-side-door">
+          ${['right', 'left', 'none'].map((k) => `<option value="${k}" ${(cfg.side_door||'right')===k?'selected':''}>${(t.sideDoors||{})[k]||k}</option>`).join('')}
+        </select>
+      </div>
+      <div class="row">
+        <label>${t.edCarBrand||'🚙 Car brand'}</label>
+        <select class="txt-inp" id="inp-car-brand">
+          ${Object.entries(CAR_BRANDS).map(([k, n]) => `<option value="${k}" ${(cfg.car_brand||'toyota')===k?'selected':''}>${n}</option>`).join('')}
+        </select>
+      </div>
+      <div class="row">
+        <label>${t.edCarModel||'🚙 Car model'}</label>
+        <input class="txt-inp" type="text" id="inp-car-model"
+          placeholder="VIOS" maxlength="14" value="${cfg.car_model ?? 'VIOS'}"/>
+      </div>
+      <div class="row">
+        <label>${t.edCarTrim||'🚙 Trim badge'}</label>
+        <input class="txt-inp" type="text" id="inp-car-trim"
+          placeholder="FR" maxlength="8" value="${cfg.car_trim || ''}"/>
+      </div>
+      <div class="row">
+        <label>${t.edCarColor||'🎨 Car colour'}</label>
+        <input type="color" id="inp-car-color" value="${cfg.car_color||'#c8bc98'}" style="width:48px;height:32px;border:none;background:none;cursor:pointer;"/>
       </div>
     </div>
   </div>
@@ -2345,6 +2717,11 @@ class GateCardEditor extends HTMLElement {
       ${this._entityField('entity_camera',        t.entityCamera,    'camera')}
       ${this._entityField('entity_motion',        t.entityMotion,    'binary_sensor')}
       ${this._entityField('entity_person',        t.entityPerson,    'binary_sensor')}
+      ${this._entityField('entity_vehicle',       t.entityVehicle || '🚗 Vehicle detection', 'binary_sensor')}
+      ${this._entityField('entity_animal',        t.entityAnimal || '🐾 Animal detection', 'binary_sensor')}
+      ${this._entityField('entity_floodlight',    t.entityFloodlight || '🔦 Camera floodlight', 'light')}
+      ${this._entityField('entity_floodlight_mode', t.entityFloodlightMode || '🔦 Floodlight mode', 'select')}
+      ${this._entityField('entity_recording',     t.entityRecording || '⏺ Camera recording', 'switch')}
       ${this._entityField('entity_flipped',       t.entityFlipped,   'input_boolean')}
     </div>
   </div>
@@ -2525,6 +2902,19 @@ class GateCardEditor extends HTMLElement {
     const plate2Inp = sr.getElementById('inp-plate-line2');
     wireTextInput(plate1Inp, 'plate_line1');
     wireTextInput(plate2Inp, 'plate_line2');
+    wireTextInput(sr.getElementById('inp-car-model'), 'car_model');
+    wireTextInput(sr.getElementById('inp-car-trim'), 'car_trim');
+
+    // country / car brand / car colour
+    [['inp-country', 'country'], ['inp-house-theme', 'house_theme'], ['inp-side-door', 'side_door'], ['inp-car-brand', 'car_brand'], ['inp-car-color', 'car_color']].forEach(([id, key]) => {
+      const el = sr.getElementById(id);
+      if (!el) return;
+      el.addEventListener('change', () => {
+        this._config = { ...this._config, [key]: el.value };
+        this._fire();
+        this._render();
+      });
+    });
 
     // no-sensor toggle
     const noSensorToggle = sr.getElementById('toggle-no-sensor');
